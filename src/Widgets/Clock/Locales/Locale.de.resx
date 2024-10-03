@@ -1,4 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+
 <root>
+    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+        <xsd:element name="root" msdata:IsDataSet="true">
+            
+        </xsd:element>
+    </xsd:schema>
     <resheader name="resmimetype">
         <value>text/microsoft-resx</value>
     </resheader>
@@ -12,17 +19,51 @@
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
     <data name="Clock" xml:space="preserve">
-        <value>Uhrzeit</value>
+        <value>Uhr</value>
     </data>
     <data name="Clock_ShowSeconds" xml:space="preserve">
-        <value>Sekunden anzeigen
-</value>
+        <value>Sekunden anzeigen</value>
+    </data>
+    <data name="Clock_Use24Hours" xml:space="preserve">
+        <value>24-Stunden-Zeit</value>
     </data>
     <data name="Clock_TimeZone" xml:space="preserve">
         <value>Zeitzone</value>
     </data>
-    <data name="Clock_Use24Hours" xml:space="preserve">
-        <value>24-Stunden-Zeit
-</value>
+    <data name="Clock_AnalogI_Title" xml:space="preserve">
+        <value>Analog I</value>
+    </data>
+    <data name="Clock_AnalogII_Title" xml:space="preserve">
+        <value>Analog II</value>
+    </data>
+    <data name="Clock_AnalogIII_Title" xml:space="preserve">
+        <value>Analog III</value>
+    </data>
+    <data name="Clock_Digital_Title" xml:space="preserve">
+        <value>Digital</value>
+    </data>
+    <data name="Clock_World_Title" xml:space="preserve">
+        <value>Weltuhr</value>
+    </data>
+    <data name="Clock_Analog_Subtitle" xml:space="preserve">
+        <value>Fügen Sie eine Uhr für eine Stadt hinzu, um die Uhrzeit an diesem Ort zu sehen</value>
+    </data>
+    <data name="Clock_World_Subtitle" xml:space="preserve">
+        <value>Sehen Sie sich die Uhrzeit in mehreren Städten auf der ganzen Welt an</value>
+    </data>
+    <data name="Clock_LocalTimeZone" xml:space="preserve">
+        <value>Lokale Zeitzone verwenden</value>
+    </data>
+    <data name="Clock_ShowDate" xml:space="preserve">
+        <value>Datum anzeigen</value>
+    </data>
+    <data name="Clock_Today" xml:space="preserve">
+        <value>Heute</value>
+    </data>
+    <data name="Clock_Yesterday" xml:space="preserve">
+        <value>Gestern</value>
+    </data>
+    <data name="Clock_Tomorrow" xml:space="preserve">
+        <value>Morgen</value>
     </data>
 </root>

@@ -24,6 +24,7 @@
 
 <a href="/README.md"><kbd><img src="https://github.com/yammadev/flag-icons/blob/master/png/US.png?raw=true" height="10" /> English</kbd></a>
 <kbd><img src="https://github.com/yammadev/flag-icons/blob/master/png/CN.png?raw=true" height="10" /> 中文 (简体)</kbd>
+<a href="/README.DE.md"><kbd><img src="https://github.com/yammadev/flag-icons/blob/master/png/DE.png?raw=true" height="10" /> German</kbd></a>
 
 ## 特点
 

@@ -1,4 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
 <root>
+    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+        <xsd:element name="root" msdata:IsDataSet="true">
+            
+        </xsd:element>
+    </xsd:schema>
     <resheader name="resmimetype">
         <value>text/microsoft-resx</value>
     </resheader>
@@ -11,89 +18,50 @@
     <resheader name="writer">
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
-    <data name="Settings" xml:space="preserve">
-        <value>Einstellungen</value>
+    <data name="Settings_Appearance" xml:space="preserve">
+        <value>Aussehen</value>
+    </data>
+    <data name="Settings_General" xml:space="preserve">
+        <value>Allgemein</value>
     </data>
     <data name="Settings_About" xml:space="preserve">
-        <value>über das Programm</value>
-    </data>
-    <data name="Settings_About_Actions" xml:space="preserve">
-        <value>Aktionen</value>
-    </data>
-    <data name="Settings_General_Actions" xml:space="preserve">
-        <value>Aktionen</value>
-    </data>
-    <data name="Settings_About_ReportBug" xml:space="preserve">
-        <value>Fehler melden</value>
-    </data>
-    <data name="Settings_About_Repository" xml:space="preserve">
-        <value>GitHub-Repository</value>
-    </data>
-    <data name="Settings_About_Version" xml:space="preserve">
-        <value>Ausführung</value>
-    </data>
-    <data name="Settings_About_Repository_Action" xml:space="preserve">
-        <value>gehen</value>
-    </data>
-    <data name="Settings_Advanced_Size" xml:space="preserve">
-        <value>Makette</value>
-    </data>
-    <data name="Settings_Appearance" xml:space="preserve">
-        <value>Dekor</value>
-    </data>
-    <data name="Settings_Appearance_AccentColor_Title" xml:space="preserve">
-        <value>Akzentfarbe</value>
-    </data>
-    <data name="Settings_Appearance_DarkMode_False" xml:space="preserve">
-        <value>Licht</value>
-    </data>
-    <data name="Settings_Appearance_DarkMode_True" xml:space="preserve">
-        <value>Dunkles</value>
-    </data>
-    <data name="Settings_Appearance_DarkMode_Subtitle" xml:space="preserve">
-        <value>Ändern der in Widgets angezeigten Farben</value>
-    </data>
-    <data name="Settings_Appearance_DarkMode_Title" xml:space="preserve">
-        <value>Wählen Sie den Modus</value>
+        <value>Über</value>
     </data>
     <data name="Settings_Appearance_Colors" xml:space="preserve">
-        <value>Thema</value>
+        <value>Farben</value>
     </data>
-    <data name="Settings_Appearance_Transparency_Subtitle" xml:space="preserve">
-        <value>Transluzente Widgets</value>
+    <data name="Settings_Appearance_DarkMode_Title" xml:space="preserve">
+        <value>Thema auswählen</value>
+    </data>
+    <data name="Settings_Appearance_DarkMode_Subtitle" xml:space="preserve">
+        <value>Ändern der im Widget angezeigten Farben</value>
+    </data>
+    <data name="Settings_Appearance_DarkMode_True" xml:space="preserve">
+        <value>Dunkel</value>
+    </data>
+    <data name="Settings_Appearance_DarkMode_False" xml:space="preserve">
+        <value>Hell</value>
+    </data>
+    <data name="Settings_Appearance_DarkMode_Null" xml:space="preserve">
+        <value>System</value>
     </data>
     <data name="Settings_Appearance_Transparency_Title" xml:space="preserve">
         <value>Transparenzeffekte</value>
     </data>
-    <data name="Settings_Advanced_WidgetMargin_Subtitle" xml:space="preserve">
-        <value>Minimaler Abstand zwischen Widgets</value>
+    <data name="Settings_Appearance_Transparency_Subtitle" xml:space="preserve">
+        <value>Widgets erscheinen durchscheinend</value>
     </data>
-    <data name="Settings_Advanced_WidgetMargin_Title" xml:space="preserve">
-        <value>Widget-Rand</value>
+    <data name="Settings_Appearance_AccentColor_Title" xml:space="preserve">
+        <value>Akzentfarbe</value>
     </data>
-    <data name="Settings_Advanced_WidgetSize_Subtitle" xml:space="preserve">
-        <value>Größe des kleinen Widgets</value>
+    <data name="Settings_Advanced_Size" xml:space="preserve">
+        <value>Größe</value>
     </data>
     <data name="Settings_Advanced_WidgetSize_Title" xml:space="preserve">
-        <value>Widget-Größe</value>
+        <value>Widgetgröße</value>
     </data>
-    <data name="Settings_General_Language" xml:space="preserve">
-        <value>Sprache</value>
-    </data>
-    <data name="Settings_General_Language_Subtitle" xml:space="preserve">
-        <value>Widgets werden in dieser Sprache angezeigt</value>
-    </data>
-    <data name="Settings_General_Language_Title" xml:space="preserve">
-        <value>Sprache anzeigen</value>
-    </data>
-    <data name="Widget" xml:space="preserve">
-        <value>Widget</value>
-    </data>
-    <data name="Widget_Edit" xml:space="preserve">
-        <value>Bearbeiten</value>
-    </data>
-    <data name="Widget_OpenSettings" xml:space="preserve">
-        <value>Widgets bearbeiten</value>
+    <data name="Settings_Advanced_WidgetMargin_Title" xml:space="preserve">
+        <value>Widgetrand</value>
     </data>
     <data name="Widget_Remove" xml:space="preserve">
         <value>Widget entfernen</value>
@@ -101,28 +69,199 @@
     <data name="Widget_Size" xml:space="preserve">
         <value>Größe</value>
     </data>
-    <data name="Widget_Size_ExtraLarge" xml:space="preserve">
-        <value>Extra groß</value>
-    </data>
-    <data name="Widget_Size_Large" xml:space="preserve">
-        <value>Groß</value>
+    <data name="Widget_Size_Small" xml:space="preserve">
+        <value>Klein</value>
     </data>
     <data name="Widget_Size_Medium" xml:space="preserve">
         <value>Mittel</value>
     </data>
-    <data name="Widget_Size_Small" xml:space="preserve">
-        <value>Klein</value>
+    <data name="Widget_Size_Large" xml:space="preserve">
+        <value>Groß</value>
+    </data>
+    <data name="Widget_Size_ExtraLarge" xml:space="preserve">
+        <value>Extragroß</value>
+    </data>
+    <data name="Widget_Edit" xml:space="preserve">
+        <value>Bearbeiten</value>
+    </data>
+    <data name="Widget_OpenSettings" xml:space="preserve">
+        <value>Widgets bearbeiten</value>
+    </data>
+    <data name="Settings" xml:space="preserve">
+        <value>Einstellungen</value>
+    </data>
+    <data name="Widget" xml:space="preserve">
+        <value>Widget</value>
+    </data>
+    <data name="Settings_About_Version" xml:space="preserve">
+        <value>Version</value>
+    </data>
+    <data name="Settings_About_Actions" xml:space="preserve">
+        <value>Aktionen</value>
+    </data>
+    <data name="Settings_About_Repository" xml:space="preserve">
+        <value>GitHub-Repository</value>
+    </data>
+    <data name="Settings_About_ReportBug" xml:space="preserve">
+        <value>Einen Fehler melden</value>
+    </data>
+    <data name="Settings_General_Language_Title" xml:space="preserve">
+        <value>Anzeigesprache</value>
+    </data>
+    <data name="Settings_General_Language_Subtitle" xml:space="preserve">
+        <value>uWidgets werden in dieser Sprache angezeigt</value>
+    </data>
+    <data name="Settings_Advanced_WidgetMargin_Subtitle" xml:space="preserve">
+        <value>Minimaler Abstand zwischen Widgets</value>
+    </data>
+    <data name="Settings_Advanced_WidgetSize_Subtitle" xml:space="preserve">
+        <value>Größe des kleinen Widgets</value>
+    </data>
+    <data name="Settings_General_Exit_Title" xml:space="preserve">
+        <value>Beenden der Anwendung</value>
+    </data>
+    <data name="Settings_General_Exit_Action" xml:space="preserve">
+        <value>Beenden</value>
+    </data>
+    <data name="Settings_General_Restart_Action" xml:space="preserve">
+        <value>Neustart</value>
+    </data>
+    <data name="Settings_General_Restart_Title" xml:space="preserve">
+        <value>Neustart der Anwendung</value>
+    </data>
+    <data name="Settings_General_Language" xml:space="preserve">
+        <value>Sprache</value>
+    </data>
+    <data name="Settings_General_Actions" xml:space="preserve">
+        <value>Aktionen</value>
+    </data>
+    <data name="Settings_About_Repository_Action" xml:space="preserve">
+        <value>Besuchen</value>
     </data>
     <data name="Widgets" xml:space="preserve">
         <value>Widgets</value>
     </data>
-    <data name="Settings_Advanced_SnapPosition_Subtitle" xml:space="preserve">
-        <value>Widget-Position am Raster ausrichten</value>
-    </data>
     <data name="Settings_Advanced_SnapPosition_Title" xml:space="preserve">
-        <value>Raster Position</value>
+        <value>Position schnappen</value>
     </data>
-    <data name="Settings_Appearance_DarkMode_Null" xml:space="preserve">
+    <data name="Settings_Advanced_SnapPosition_Subtitle" xml:space="preserve">
+        <value>Position am Raster ausrichten</value>
+    </data>
+    <data name="Widget_Save" xml:space="preserve">
+        <value>Fertig</value>
+    </data>
+    <data name="Settings_Appearance_Monochrome_Title" xml:space="preserve">
+        <value>Monochromes Thema</value>
+    </data>
+    <data name="Settings_Appearance_Monochrome_Subtitle" xml:space="preserve">
+        <value>Widget-Elemente werden in der selben Farbe angezeigt</value>
+    </data>
+    <data name="Update_SoftwareUpdate" xml:space="preserve">
+        <value>Software-Update</value>
+    </data>
+    <data name="Update_UpdateFormat" xml:space="preserve">
+        <value>uWidgets {0} steht zum&#160;Download bereit</value>
+    </data>
+    <data name="Update_Download" xml:space="preserve">
+        <value>Download</value>
+    </data>
+    <data name="Update_Later" xml:space="preserve">
+        <value>Später</value>
+    </data>
+    <data name="Update_SkipThisVersion" xml:space="preserve">
+        <value>Diese Version überspringen</value>
+    </data>
+    <data name="Settings_Appearance_AccentColor_Null" xml:space="preserve">
         <value>System</value>
+    </data>
+    <data name="Settings_Appearance_AccentColor_Manual" xml:space="preserve">
+        <value>Manuell</value>
+    </data>
+    <data name="Settings_General_Startup_Title" xml:space="preserve">
+        <value>Mit Windows starten</value>
+    </data>
+    <data name="Settings_General_Startup_Subtitle" xml:space="preserve">
+        <value>Die App startet automatisch, wenn Sie Ihr Gerät starten</value>
+    </data>
+    <data name="Settings_General_Startup" xml:space="preserve">
+        <value>Start</value>
+    </data>
+    <data name="Settings_Advanced_SnapSize_Title" xml:space="preserve">
+        <value>Größe schnappen</value>
+    </data>
+    <data name="Settings_Advanced_SnapSize_Subtitle" xml:space="preserve">
+        <value>Widgetgröße am Raster ausrichten</value>
+    </data>
+    <data name="Settings_Advanced_LockSize_Title" xml:space="preserve">
+        <value>Größe sperren</value>
+    </data>
+    <data name="Settings_Advanced_LockPosition_Title" xml:space="preserve">
+        <value>Position sperren</value>
+    </data>
+    <data name="Settings_Advanced_LockSize_Subtitle" xml:space="preserve">
+        <value>Verhindert die versehentliche Größenänderung von Widgets</value>
+    </data>
+    <data name="Settings_Advanced_LockPosition_Subtitle" xml:space="preserve">
+        <value>Verhindert die versehentliche Neupositionierung von Widgets</value>
+    </data>
+    <data name="Settings_Advanced_Position" xml:space="preserve">
+        <value>Position</value>
+    </data>
+    <data name="Settings_Advanced" xml:space="preserve">
+        <value>Erweitert</value>
+    </data>
+    <data name="Settings_Advanced_WidgetRadius_Title" xml:space="preserve">
+        <value>Widgetradius</value>
+    </data>
+    <data name="Settings_Advanced_WidgetRadius_Subtitle" xml:space="preserve">
+        <value>Radius der Widget-Ecken</value>
+    </data>
+    <data name="Settings_RestartRequired" xml:space="preserve">
+        <value>Starten Sie die App neu, um die Änderungen zu übernehmen</value>
+    </data>
+    <data name="Settings_AdminRequired" xml:space="preserve">
+        <value>Führen Sie die Anwendung als Administrator aus, um diese Einstellung zu ändern</value>
+    </data>
+    <data name="Settings_Advanced_Dimensions" xml:space="preserve">
+        <value>Dimensionen</value>
+    </data>
+    <data name="Settings_Appearance_ApplyTheme" xml:space="preserve">
+        <value>Ein Thema anwenden</value>
+    </data>
+    <data name="Settings_Appearance_Presets_Windows_Title" xml:space="preserve">
+        <value>Windows</value>
+    </data>
+    <data name="Settings_Appearance_Presets_Windows_Subtitle" xml:space="preserve">
+        <value>Segoe UI, scharfe Ecken, nativer Rahmen</value>
+    </data>
+    <data name="Settings_Appearance_Presets_Apply" xml:space="preserve">
+        <value>Anwenden</value>
+    </data>
+    <data name="Settings_Appearance_Presets_Apple_Title" xml:space="preserve">
+        <value>Apple</value>
+    </data>
+    <data name="Settings_Appearance_Presets_Apple_Subtitle" xml:space="preserve">
+        <value>Inter, runde Ecken, kein Rand, kein Schatten</value>
+    </data>
+    <data name="Settings_Advanced_Appearance" xml:space="preserve">
+        <value>Aussehen</value>
+    </data>
+    <data name="Settings_Advanced_FontFamily_Title" xml:space="preserve">
+        <value>Schriftfamilie</value>
+    </data>
+    <data name="Settings_Advanced_FontFamily_Subtitle" xml:space="preserve">
+        <value>In Widgets verwendete Schriftfamilie</value>
+    </data>
+    <data name="Settings_Advanced_UseNativeFrame_Subtitle" xml:space="preserve">
+        <value>Verwendet einen nativen Fensterrahmen</value>
+    </data>
+    <data name="Settings_Advanced_UseNativeFrame_Title" xml:space="preserve">
+        <value>Nativer Fensterrahmen</value>
+    </data>
+    <data name="Settings_Appearance_OpacityLevel_Title" xml:space="preserve">
+        <value>Deckkraft</value>
+    </data>
+    <data name="Settings_Appearance_OpacityLevel_Subtitle" xml:space="preserve">
+        <value>Deckkraft des Widget-Hintergrunds</value>
     </data>
 </root>
