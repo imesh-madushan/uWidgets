@@ -20,6 +20,10 @@
                        FontSize="8" Opacity="0.5" />
             <TextBlock Text="{Binding TimeText}"
                        FontSize="34" HorizontalAlignment="Center" />
+            <TextBlock Text="{Binding CityFullName}"
+                       Margin="0,0,0,4"
+                       FontSize="8" Opacity="0.5" HorizontalAlignment="Center"
+                       IsVisible="{Binding ShowTimeZone}"/>
         </StackPanel>
     </Viewbox>
 </UserControl>

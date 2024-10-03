@@ -17,6 +17,8 @@ public class DigitalClockViewModel : ReactiveObject, IDisposable
         UpdateTime();
     }
     
+    public string CityFullName => TimeZoneInfo.DisplayName.Split(") ").Last().Split(", ").First().Split("(").First();
+    
     public void Dispose()
     {
         timer.Unsubscribe(UpdateTime);
@@ -48,4 +50,5 @@ public class DigitalClockViewModel : ReactiveObject, IDisposable
     public string TimeText => Time.ToString($"{HH}:mm{SS}{AM}");
     public string DateText => Time.ToString("D", Thread.CurrentThread.CurrentUICulture); 
     public bool ShowDate => clockModel.ShowDate;
+    public bool ShowTimeZone => clockModel.ShowTimeZone;
 }

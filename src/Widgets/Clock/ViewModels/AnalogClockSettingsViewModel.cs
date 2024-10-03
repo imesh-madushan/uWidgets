@@ -26,6 +26,12 @@ public class AnalogClockSettingsViewModel(IWidgetLayoutProvider widgetLayoutProv
         get => clockModel.Use24Hours;
         set => UpdateClockModel(clockModel with { Use24Hours = value });
     }
+    
+    public bool ShowTimeZone
+    {
+        get => clockModel.ShowTimeZone;
+        set => UpdateClockModel(clockModel with { ShowTimeZone = value });
+    }
 
     public bool ShowTimeZones => !UseLocalTimeZone;
 

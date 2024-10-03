@@ -59,4 +59,7 @@
     <data name="Clock_Yesterday" xml:space="preserve">
         <value>Вчера</value>
     </data>
+    <data name="Clock_ShowTimeZone" xml:space="preserve">
+        <value>Показывать часовой пояс</value>
+    </data>
 </root>

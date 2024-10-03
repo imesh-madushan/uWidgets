@@ -11,6 +11,7 @@ public class WorldClockViewModel(WorldClockModel worldClockModel) : ReactiveObje
             new AnalogClockViewModel(new ClockModel(
                 false, 
                 false,
+                false,
                 false, 
                 worldClockModel.TimeZoneIds.ElementAtOrDefault(i))))
         .ToList();

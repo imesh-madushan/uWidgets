@@ -14,6 +14,9 @@
             <controls:Setting Title="{x:Static locales:Locale.Clock_ShowDate}">
                 <ToggleSwitch IsChecked="{Binding ShowDate} "/>
             </controls:Setting> 
+            <controls:Setting Title="{x:Static locales:Locale.Clock_ShowTimeZone}">
+                <ToggleSwitch IsChecked="{Binding ShowTimeZone} "/>
+            </controls:Setting> 
             <controls:Setting Title="{x:Static locales:Locale.Clock_Use24Hours}">
                 <ToggleSwitch IsChecked="{Binding Use24Hours} "/>
             </controls:Setting>

@@ -57,6 +57,9 @@
     <data name="Clock_ShowDate" xml:space="preserve">
         <value>Show date</value>
     </data>
+    <data name="Clock_ShowTimeZone" xml:space="preserve">
+        <value>Show time zone</value>
+    </data>
     <data name="Clock_Today" xml:space="preserve">
         <value>Today</value>
     </data>

@@ -141,6 +141,15 @@ namespace Clock.Locales {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Show time zone.
+        /// </summary>
+        public static string Clock_ShowTimeZone {
+            get {
+                return ResourceManager.GetString("Clock_ShowTimeZone", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Time zone.
         /// </summary>
         public static string Clock_TimeZone {
