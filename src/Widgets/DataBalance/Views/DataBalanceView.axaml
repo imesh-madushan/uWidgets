@@ -1,261 +1,170 @@
-﻿<UserControl
+<UserControl
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="using:DataBalance.ViewModels"
+    xmlns:models="using:DataBalance.Models"
     x:Class="DataBalance.Views.DataBalanceView"
     x:DataType="vm:DataBalanceViewModel"
     mc:Ignorable="d"
     d:DesignWidth="300"
     d:DesignHeight="330">
 
-	<!-- uWidgets supplies the outer translucent background -->
-	<Border
-        Width="300"
-        Padding="8"
-        Background="Transparent">
+    <Border Width="300" MinHeight="330" Padding="12" Background="Transparent">
+        <Grid>
+            <!-- First-use account entry -->
+            <StackPanel IsVisible="{Binding IsAccountEntryVisible}"
+                        VerticalAlignment="Center" Spacing="12">
+                <TextBlock Text="Connect MyDialog" FontSize="20" FontWeight="SemiBold"
+                           Foreground="White" HorizontalAlignment="Center" />
+                <TextBlock Text="Enter the email address or Dialog mobile number linked to your account."
+                           FontSize="11" Foreground="#A0FFFFFF" TextWrapping="Wrap"
+                           TextAlignment="Center" />
+                <TextBox x:Name="AccountInput" Text="{Binding AccountIdentifier}"
+                         Watermark="Email or mobile number" FontSize="12"
+                         KeyDown="AccountInput_KeyDown" />
+                <Button Content="CONTINUE" HorizontalAlignment="Stretch"
+                        Click="ContinueButton_Click" />
+                <TextBlock Text="{Binding StatusMessage}" FontSize="10"
+                           Foreground="#80FFFFFF" TextWrapping="Wrap" TextAlignment="Center" />
+            </StackPanel>
 
-		<StackPanel Spacing="0">
+            <!-- Manual OTP entry -->
+            <StackPanel IsVisible="{Binding IsOtpVisible}"
+                        VerticalAlignment="Center" Spacing="12">
+                <TextBlock Text="Verification code" FontSize="19" FontWeight="SemiBold"
+                           Foreground="White" HorizontalAlignment="Center" />
+                <TextBlock Text="{Binding StatusMessage}" FontSize="11"
+                           Foreground="#A0FFFFFF" TextWrapping="Wrap" TextAlignment="Center" />
+                <StackPanel x:Name="OtpBoxesPanel" Orientation="Horizontal"
+                            HorizontalAlignment="Center" Spacing="5" />
+                <Grid ColumnDefinitions="*,*">
+                    <Button Grid.Column="0" Margin="0,0,4,0" Content="BACK" Click="CancelOtpButton_Click" />
+                    <Button Grid.Column="1" Margin="4,0,0,0" Content="RESEND" IsEnabled="{Binding CanResendOtp}"
+                            Click="ResendOtpButton_Click" />
+                </Grid>
+                <ProgressBar IsIndeterminate="True" IsVisible="{Binding IsRefreshing}" Height="3" />
+            </StackPanel>
 
-			<!-- Header -->
-			<Border
-                Padding="4,4,4,11"
-                BorderBrush="#20FFFFFF"
-                BorderThickness="0,0,0,1">
+            <!-- Linked connection chooser -->
+            <Grid IsVisible="{Binding IsConnectionPickerVisible}" RowDefinitions="Auto,Auto,*,Auto">
+                <TextBlock Grid.Row="0" Text="Choose connection" FontSize="18"
+                           FontWeight="SemiBold" Foreground="White" />
+                <TextBlock Grid.Row="1" Margin="0,5,0,8" Text="{Binding StatusMessage}"
+                           FontSize="10" Foreground="#90FFFFFF" />
+                <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding Connections}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="models:DialogConnection">
+                                <Button Margin="0,0,0,6" Padding="10" HorizontalContentAlignment="Stretch"
+                                        Click="ConnectionButton_Click">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding DisplayName}" Foreground="White"
+                                                       FontWeight="SemiBold" FontSize="12" />
+                                            <TextBlock Text="{Binding PackageName}" Foreground="#80FFFFFF"
+                                                       FontSize="9" TextTrimming="CharacterEllipsis" />
+                                        </StackPanel>
+                                        <TextBlock Grid.Column="1" Text="{Binding FriendlyType}"
+                                                   Foreground="#60CDFF" FontSize="9"
+                                                   VerticalAlignment="Center" />
+                                    </Grid>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+                <Button Grid.Row="3" Margin="0,6,0,0" Content="SIGN OUT AND REMOVE ACCOUNT"
+                        Click="SignOutButton_Click" />
+            </Grid>
 
-				<Grid ColumnDefinitions="Auto,*,Auto">
+            <!-- Recoverable network or service error -->
+            <StackPanel IsVisible="{Binding IsErrorVisible}"
+                        VerticalAlignment="Center" Spacing="12">
+                <TextBlock Text="Unable to load balance" FontSize="18" FontWeight="SemiBold"
+                           Foreground="White" HorizontalAlignment="Center" />
+                <TextBlock Text="{Binding StatusMessage}" FontSize="10" Foreground="#A0FFFFFF"
+                           TextWrapping="Wrap" TextAlignment="Center" />
+                <Button Content="TRY AGAIN" Click="RefreshButton_Click" />
+                <Button Content="SIGN OUT AND REMOVE ACCOUNT" Click="SignOutButton_Click" />
+            </StackPanel>
 
-					<!-- Reliable vector Wi-Fi icon -->
-					<Viewbox
-                        Grid.Column="0"
-                        Width="22"
-                        Height="22"
-                        Margin="0,0,8,0"
-                        VerticalAlignment="Top">
+            <!-- Authenticated balance -->
+            <Grid IsVisible="{Binding IsBalanceVisible}" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
+                <Border Grid.Row="0" Padding="2,2,2,10" BorderBrush="#20FFFFFF" BorderThickness="0,0,0,1">
+                    <Grid ColumnDefinitions="*,Auto,Auto">
+                        <StackPanel Spacing="1">
+                            <TextBlock Text="{Binding ConnectionName}" FontSize="14" FontWeight="Bold"
+                                       Foreground="White" TextTrimming="CharacterEllipsis" />
+                            <TextBlock Text="{Binding ConnectionKind}" FontSize="9" Foreground="#60CDFF" />
+                            <TextBlock Text="{Binding PhoneNumber}" FontSize="9" Foreground="#78FFFFFF" />
+                        </StackPanel>
+                        <Button Grid.Column="1" Width="28" Height="28" Margin="4,0" Padding="0"
+                                Content="⇄" ToolTip.Tip="Change connection"
+                                Click="ChooseConnectionButton_Click" />
+                        <Button Grid.Column="2" Width="28" Height="28" Padding="0"
+                                Content="⎋" ToolTip.Tip="Sign out and remove account"
+                                Click="SignOutButton_Click" />
+                    </Grid>
+                </Border>
 
-						<Path
-                            Fill="#60CDFF"
-                            Stretch="Uniform"
-                            Data="M1,9 L3,11 C8,6 16,6 21,11 L23,9 C16.5,2.5 7.5,2.5 1,9 M5,13 L7,15 C9.8,12.2 14.2,12.2 17,15 L19,13 C15.1,9.1 8.9,9.1 5,13 M9,17 L12,20 L15,17 C13.3,15.3 10.7,15.3 9,17" />
-					</Viewbox>
+                <Border Grid.Row="1" Padding="2,10" BorderBrush="#20FFFFFF" BorderThickness="0,0,0,1">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Spacing="3">
+                            <TextBlock Text="PREPAID BALANCE" FontSize="9" Foreground="#78FFFFFF" />
+                            <TextBlock Text="{Binding Balance}" FontSize="18" FontWeight="SemiBold" Foreground="White" />
+                        </StackPanel>
+                        <TextBlock Grid.Column="1" Text="{Binding Validity}" FontSize="9"
+                                   Foreground="#A0FFFFFF" VerticalAlignment="Center" />
+                    </Grid>
+                </Border>
 
-					<StackPanel
-                        Grid.Column="1"
-                        Spacing="2">
+                <Border Grid.Row="2" Padding="2,9" BorderBrush="#20FFFFFF" BorderThickness="0,0,0,1">
+                    <StackPanel Spacing="5">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Text="{Binding PackageOneType}" FontSize="9" Foreground="#78FFFFFF" />
+                            <TextBlock Grid.Column="1" Text="{Binding PackageOneRemaining}" FontSize="13"
+                                       FontWeight="SemiBold" Foreground="#60CDFF" />
+                        </Grid>
+                        <ProgressBar Height="4" Maximum="100" Value="{Binding PackageOnePercentage}"
+                                     Foreground="#60CDFF" Background="#28FFFFFF" />
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Text="{Binding PackageOneName}" FontSize="9" Foreground="#75FFFFFF"
+                                       TextTrimming="CharacterEllipsis" />
+                            <TextBlock Grid.Column="1" Text="{Binding PackageOneExpiry}" FontSize="9"
+                                       Foreground="#60CDFF" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
 
-						<TextBlock
-                            Text="{Binding ConnectionName}"
-                            FontSize="14"
-                            FontWeight="Bold"
-                            Foreground="White"
-                            TextTrimming="CharacterEllipsis" />
+                <Border Grid.Row="3" Padding="2,9" BorderBrush="#20FFFFFF" BorderThickness="0,0,0,1">
+                    <StackPanel Spacing="5">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Text="{Binding PackageTwoType}" FontSize="9" Foreground="#78FFFFFF" />
+                            <TextBlock Grid.Column="1" Text="{Binding PackageTwoRemaining}" FontSize="13"
+                                       FontWeight="SemiBold" Foreground="#60CDFF" />
+                        </Grid>
+                        <ProgressBar Height="4" Maximum="100" Value="{Binding PackageTwoPercentage}"
+                                     Foreground="#60CDFF" Background="#28FFFFFF" />
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Text="{Binding PackageTwoName}" FontSize="9" Foreground="#75FFFFFF"
+                                       TextTrimming="CharacterEllipsis" />
+                            <TextBlock Grid.Column="1" Text="{Binding PackageTwoExpiry}" FontSize="9"
+                                       Foreground="#60CDFF" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
 
-						<TextBlock
-                            Text="{Binding PhoneNumber}"
-                            FontSize="10"
-                            Foreground="#78FFFFFF"
-                            TextTrimming="CharacterEllipsis" />
-					</StackPanel>
-
-					<!-- Connection badge -->
-					<Border
-                        Grid.Column="2"
-                        Padding="8,4"
-                        CornerRadius="10"
-                        Background="#2638C172"
-                        VerticalAlignment="Center">
-
-						<TextBlock
-                            Text="{Binding ConnectionStatus}"
-                            FontSize="9"
-                            FontWeight="SemiBold"
-                            Foreground="#54D98C" />
-					</Border>
-				</Grid>
-			</Border>
-
-			<!-- Prepaid balance -->
-			<Border
-                Padding="4,12"
-                BorderBrush="#20FFFFFF"
-                BorderThickness="0,0,0,1">
-
-				<StackPanel Spacing="6">
-
-					<TextBlock
-                        Text="PREPAID BALANCE"
-                        FontSize="9"
-                        FontWeight="SemiBold"
-                        Foreground="#78FFFFFF" />
-
-					<Grid ColumnDefinitions="*,Auto">
-
-						<TextBlock
-                            Grid.Column="0"
-                            Text="{Binding Balance}"
-                            FontSize="18"
-                            FontWeight="SemiBold"
-                            Foreground="White"
-                            VerticalAlignment="Center" />
-
-						<Border
-                            Grid.Column="1"
-                            Padding="7,3"
-                            CornerRadius="6"
-                            Background="#15FFFFFF"
-                            VerticalAlignment="Center">
-
-							<TextBlock
-                                Text="{Binding Validity}"
-                                FontSize="9"
-                                Foreground="#A0FFFFFF"
-                                TextTrimming="CharacterEllipsis" />
-						</Border>
-					</Grid>
-				</StackPanel>
-			</Border>
-
-			<!-- First data package -->
-			<Border
-                Padding="4,12"
-                BorderBrush="#20FFFFFF"
-                BorderThickness="0,0,0,1">
-
-				<StackPanel Spacing="7">
-
-					<Grid ColumnDefinitions="*,Auto">
-
-						<TextBlock
-                            Grid.Column="0"
-                            Text="{Binding PackageOneType}"
-                            FontSize="9"
-                            FontWeight="SemiBold"
-                            Foreground="#78FFFFFF"
-                            TextTrimming="CharacterEllipsis" />
-
-						<TextBlock
-                            Grid.Column="1"
-                            Text="{Binding PackageOneRemaining}"
-                            FontSize="14"
-                            FontWeight="SemiBold"
-                            Foreground="#60CDFF" />
-					</Grid>
-
-					<ProgressBar
-                        Height="4"
-                        Minimum="0"
-                        Maximum="100"
-                        Value="{Binding PackageOnePercentage}"
-                        Foreground="#60CDFF"
-                        Background="#28FFFFFF" />
-
-					<Grid ColumnDefinitions="*,Auto">
-
-						<TextBlock
-                            Grid.Column="0"
-                            MaxWidth="180"
-                            Text="{Binding PackageOneName}"
-                            FontSize="9"
-                            Foreground="#75FFFFFF"
-                            TextTrimming="CharacterEllipsis" />
-
-						<TextBlock
-                            Grid.Column="1"
-                            Margin="8,0,0,0"
-                            Text="{Binding PackageOneExpiry}"
-                            FontSize="9"
-                            Foreground="#60CDFF"
-                            TextTrimming="CharacterEllipsis" />
-					</Grid>
-				</StackPanel>
-			</Border>
-
-			<!-- Second data package -->
-			<Border
-                Padding="4,12"
-                BorderBrush="#20FFFFFF"
-                BorderThickness="0,0,0,1">
-
-				<StackPanel Spacing="7">
-
-					<Grid ColumnDefinitions="*,Auto">
-
-						<TextBlock
-                            Grid.Column="0"
-                            Text="{Binding PackageTwoType}"
-                            FontSize="9"
-                            FontWeight="SemiBold"
-                            Foreground="#78FFFFFF"
-                            TextTrimming="CharacterEllipsis" />
-
-						<TextBlock
-                            Grid.Column="1"
-                            Text="{Binding PackageTwoRemaining}"
-                            FontSize="14"
-                            FontWeight="SemiBold"
-                            Foreground="#60CDFF" />
-					</Grid>
-
-					<ProgressBar
-                        Height="4"
-                        Minimum="0"
-                        Maximum="100"
-                        Value="{Binding PackageTwoPercentage}"
-                        Foreground="#60CDFF"
-                        Background="#28FFFFFF" />
-
-					<Grid ColumnDefinitions="*,Auto">
-
-						<TextBlock
-                            Grid.Column="0"
-                            MaxWidth="180"
-                            Text="{Binding PackageTwoName}"
-                            FontSize="9"
-                            Foreground="#75FFFFFF"
-                            TextTrimming="CharacterEllipsis" />
-
-						<TextBlock
-                            Grid.Column="1"
-                            Margin="8,0,0,0"
-                            Text="{Binding PackageTwoExpiry}"
-                            FontSize="9"
-                            Foreground="#60CDFF"
-                            TextTrimming="CharacterEllipsis" />
-					</Grid>
-				</StackPanel>
-			</Border>
-
-			<!-- Footer -->
-			<Grid
-                Margin="4,10,4,2"
-                ColumnDefinitions="*,Auto">
-
-				<TextBlock
-                    Grid.Column="0"
-                    Text="{Binding UpdatedText}"
-                    FontSize="9"
-                    Foreground="#65FFFFFF"
-                    VerticalAlignment="Center" />
-
-				<Button
-                    Grid.Column="1"
-                    Width="28"
-                    Height="28"
-                    Padding="0"
-                    CornerRadius="14"
-                    Click="RefreshButton_Click"
-                    Background="#12FFFFFF"
-                    Foreground="#BFFFFFFF"
-                    ToolTip.Tip="Refresh now">
-
-					<TextBlock
-                        Text="↻"
-                        FontSize="16"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center" />
-				</Button>
-			</Grid>
-		</StackPanel>
-	</Border>
+                <Grid Grid.Row="4" Margin="2,8,2,0" ColumnDefinitions="*,Auto">
+                    <StackPanel>
+                        <TextBlock Text="{Binding ConnectionStatus}" FontSize="9" Foreground="#54D98C" />
+                        <TextBlock Text="{Binding UpdatedText}" FontSize="9" Foreground="#65FFFFFF" />
+                    </StackPanel>
+                    <Button Grid.Column="1" Width="28" Height="28" Padding="0" Content="↻"
+                            ToolTip.Tip="Refresh now" Click="RefreshButton_Click" />
+                </Grid>
+            </Grid>
+        </Grid>
+    </Border>
 </UserControl>

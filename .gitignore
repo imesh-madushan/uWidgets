@@ -7,3 +7,5 @@ riderModule.iml
 uWidgets.sln.DotSettings.user
 /src/.vs
 *.env
+.playwright-mcp/
+dialog-auth*.json

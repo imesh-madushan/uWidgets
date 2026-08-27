@@ -8,6 +8,7 @@ public sealed record DialogBalanceSnapshot(
     string Status,
     string ConnectionName,
     string Msisdn,
+    string ConnectionKind,
     string PrepaidBalance,
     string Validity,
     IReadOnlyList<DialogPackageSnapshot> Packages);
