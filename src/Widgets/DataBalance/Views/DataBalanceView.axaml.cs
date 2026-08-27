@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 using Avalonia.Threading;
 using DataBalance.Models;
 using DataBalance.ViewModels;
@@ -15,6 +16,7 @@ public partial class DataBalanceView : UserControl
 {
     private readonly DataBalanceViewModel _viewModel = new();
     private readonly DispatcherTimer _refreshTimer;
+    private readonly DispatcherTimer _otpTimer;
     private readonly List<TextBox> _otpBoxes = [];
     private bool _otpSubmissionStarted;
     private bool _updatingOtpBoxes;
@@ -29,10 +31,13 @@ public partial class DataBalanceView : UserControl
         _viewModel.PropertyChanged += ViewModel_PropertyChanged;
         _refreshTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(30) };
         _refreshTimer.Tick += RefreshTimer_Tick;
+        _otpTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+        _otpTimer.Tick += OtpTimer_Tick;
 
         AttachedToVisualTree += async (_, _) =>
         {
             _refreshTimer.Start();
+            _otpTimer.Start();
             if (!_initialized)
             {
                 _initialized = true;
@@ -40,7 +45,11 @@ public partial class DataBalanceView : UserControl
             }
         };
 
-        DetachedFromVisualTree += (_, _) => _refreshTimer.Stop();
+        DetachedFromVisualTree += (_, _) =>
+        {
+            _refreshTimer.Stop();
+            _otpTimer.Stop();
+        };
     }
 
     private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -65,17 +74,26 @@ public partial class DataBalanceView : UserControl
         OtpBoxesPanel.Children.Clear();
         _otpBoxes.Clear();
 
-        double width = count <= 6 ? 36 : Math.Max(25, 238d / count);
+        // Keep the complete code comfortably inside the widget's 276 px content area.
+        double width = Math.Clamp((244d - (Math.Max(1, count) - 1) * 4) / Math.Max(1, count), 24, 32);
         for (int index = 0; index < count; index++)
         {
             var box = new TextBox
             {
                 Width = width,
-                Height = 42,
-                FontSize = 17,
-                TextAlignment = Avalonia.Media.TextAlignment.Center,
+                MinWidth = 0,
+                Height = 36,
+                MinHeight = 0,
+                Padding = new Avalonia.Thickness(0),
+                FontSize = 16,
+                MaxLength = count,
+                TextAlignment = TextAlignment.Center,
                 HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center,
                 VerticalContentAlignment = Avalonia.Layout.VerticalAlignment.Center,
+                Background = new SolidColorBrush(Color.Parse("#18FFFFFF")),
+                BorderBrush = new SolidColorBrush(Color.Parse("#65FFFFFF")),
+                BorderThickness = new Avalonia.Thickness(1),
+                CornerRadius = new Avalonia.CornerRadius(6),
                 Tag = index
             };
             box.TextChanged += OtpBox_TextChanged;
@@ -96,9 +114,16 @@ public partial class DataBalanceView : UserControl
         {
             if (digits.Length > 1)
             {
-                for (int offset = 0; offset < digits.Length && index + offset < _otpBoxes.Count; offset++)
-                    _otpBoxes[index + offset].Text = digits[offset].ToString();
-                _otpBoxes[Math.Min(index + digits.Length, _otpBoxes.Count) - 1].CaretIndex = 1;
+                int target = index;
+                foreach (char digit in digits)
+                {
+                    if (target >= _otpBoxes.Count) break;
+                    _otpBoxes[target++].Text = digit.ToString();
+                }
+
+                int focusIndex = Math.Min(target, _otpBoxes.Count - 1);
+                _otpBoxes[focusIndex].Focus();
+                _otpBoxes[focusIndex].CaretIndex = _otpBoxes[focusIndex].Text?.Length ?? 0;
             }
             else
             {
@@ -130,18 +155,50 @@ public partial class DataBalanceView : UserControl
     private void OtpBox_KeyDown(object? sender, KeyEventArgs e)
     {
         if (sender is not TextBox box || box.Tag is not int index) return;
-        if (e.Key == Key.Back && string.IsNullOrEmpty(box.Text) && index > 0)
+        if (e.Key == Key.Back)
         {
-            _otpBoxes[index - 1].Focus();
-            _otpBoxes[index - 1].Text = "";
+            _updatingOtpBoxes = true;
+            try
+            {
+                if (!string.IsNullOrEmpty(box.Text))
+                {
+                    box.Text = "";
+                    box.CaretIndex = 0;
+                }
+                else if (index > 0)
+                {
+                    TextBox previous = _otpBoxes[index - 1];
+                    previous.Text = "";
+                    previous.Focus();
+                    previous.CaretIndex = 0;
+                }
+            }
+            finally
+            {
+                _updatingOtpBoxes = false;
+            }
+
+            _otpSubmissionStarted = false;
+            e.Handled = true;
         }
         else if (e.Key == Key.Left && index > 0)
         {
             _otpBoxes[index - 1].Focus();
+            e.Handled = true;
         }
         else if (e.Key == Key.Right && index + 1 < _otpBoxes.Count)
         {
             _otpBoxes[index + 1].Focus();
+            e.Handled = true;
+        }
+        else if (e.Key == Key.Delete)
+        {
+            _updatingOtpBoxes = true;
+            box.Text = "";
+            box.CaretIndex = 0;
+            _updatingOtpBoxes = false;
+            _otpSubmissionStarted = false;
+            e.Handled = true;
         }
     }
 
@@ -150,6 +207,7 @@ public partial class DataBalanceView : UserControl
         _updatingOtpBoxes = true;
         foreach (TextBox box in _otpBoxes) box.Text = "";
         _updatingOtpBoxes = false;
+        _otpSubmissionStarted = false;
     }
 
     private async void AccountInput_KeyDown(object? sender, KeyEventArgs e)
@@ -159,6 +217,12 @@ public partial class DataBalanceView : UserControl
 
     private async void ContinueButton_Click(object? sender, RoutedEventArgs e) =>
         await _viewModel.StartLoginAsync();
+
+    private async void InstallDependenciesButton_Click(object? sender, RoutedEventArgs e) =>
+        await _viewModel.InstallDependenciesAsync();
+
+    private async void CheckDependenciesButton_Click(object? sender, RoutedEventArgs e) =>
+        await _viewModel.InitializeAsync();
 
     private async void CancelOtpButton_Click(object? sender, RoutedEventArgs e) =>
         await _viewModel.CancelLoginAsync();
@@ -186,6 +250,12 @@ public partial class DataBalanceView : UserControl
     private async void RefreshTimer_Tick(object? sender, EventArgs e) =>
         await _viewModel.RefreshAsync();
 
+    private async void OtpTimer_Tick(object? sender, EventArgs e) =>
+        await _viewModel.UpdateOtpStateAsync();
+
     private async void RefreshButton_Click(object? sender, RoutedEventArgs e) =>
+        await _viewModel.RefreshAsync();
+
+    private async void ReconnectButton_Click(object? sender, RoutedEventArgs e) =>
         await _viewModel.RefreshAsync();
 }

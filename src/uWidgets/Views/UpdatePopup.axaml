@@ -5,7 +5,7 @@
         x:Class="uWidgets.Views.UpdatePopup"
         Background="{DynamicResource SettingsBackground}"
         ExtendClientAreaToDecorationsHint="True"
-        ExtendClientAreaChromeHints="NoChrome"
+        WindowDecorations="None"
         ExtendClientAreaTitleBarHeightHint="40"
         WindowStartupLocation="CenterScreen"
         Topmost="True"

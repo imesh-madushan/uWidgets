@@ -5,7 +5,8 @@ riderModule.iml
 /_ReSharper.Caches/
 .idea/
 uWidgets.sln.DotSettings.user
-/src/.vs
+*.vs
 *.env
+*.codex
 .playwright-mcp/
 dialog-auth*.json

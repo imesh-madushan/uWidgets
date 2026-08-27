@@ -3,13 +3,12 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Styling;
 
 namespace uWidgets.Views.Controls;
 
-public class ClickThroughTextBox : TextBox, IStyleable
+public class ClickThroughTextBox : TextBox
 {
-    Type IStyleable.StyleKey => typeof(TextBox);
+    protected override Type StyleKeyOverride => typeof(TextBox);
     public FlyoutBase? DefaultContextFlyout { get; set; }
     
     public ClickThroughTextBox()
@@ -29,7 +28,7 @@ public class ClickThroughTextBox : TextBox, IStyleable
              (e.Key == Key.Tab && !AcceptsTab) ||
              (e.Key == Key.Escape)))
         {
-            widget.FocusManager?.ClearFocus();
+            widget.FocusManager?.Focus(null);
         }
     }
 

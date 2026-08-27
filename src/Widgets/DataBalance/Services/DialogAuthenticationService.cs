@@ -2,6 +2,7 @@ using DataBalance.Automation;
 using DataBalance.Models;
 using Microsoft.Playwright;
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,6 +16,23 @@ public sealed class DialogAuthenticationService : IAsyncDisposable
     private IBrowser? _browser;
     private IBrowserContext? _context;
     private IPage? _page;
+
+    public async Task<bool> AreDependenciesInstalledAsync()
+    {
+        ConfigureDriverSearchPath();
+        using IPlaywright playwright = await Playwright.CreateAsync();
+        return File.Exists(playwright.Chromium.ExecutablePath);
+    }
+
+    public async Task InstallDependenciesAsync(CancellationToken cancellationToken = default)
+    {
+        int exitCode = await Task.Run(
+            () => Microsoft.Playwright.Program.Main(["install", "chromium"]),
+            cancellationToken);
+
+        if (exitCode != 0 || !await AreDependenciesInstalledAsync())
+            throw new InvalidOperationException($"Playwright could not install Chromium (exit code {exitCode}).");
+    }
 
     public async Task<DialogOtpChallenge> StartOtpAsync(
         string identifier,
@@ -193,20 +211,9 @@ public sealed class DialogAuthenticationService : IAsyncDisposable
     private async Task OpenBrowserAsync(string? storageStateJson, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
+        ConfigureDriverSearchPath();
         _playwright = await Playwright.CreateAsync();
-        try
-        {
-            _browser = await LaunchChromiumAsync();
-        }
-        catch (PlaywrightException exception) when (
-            exception.Message.Contains("Executable doesn't exist", StringComparison.OrdinalIgnoreCase))
-        {
-            int exitCode = await Task.Run(() =>
-                Microsoft.Playwright.Program.Main(["install", "chromium"]), cancellationToken);
-            if (exitCode != 0)
-                throw new InvalidOperationException("Playwright could not install Chromium.", exception);
-            _browser = await LaunchChromiumAsync();
-        }
+        _browser = await LaunchChromiumAsync();
         _context = await _browser.NewContextAsync(new BrowserNewContextOptions
         {
             StorageState = storageStateJson,
@@ -218,6 +225,13 @@ public sealed class DialogAuthenticationService : IAsyncDisposable
 
     private Task<IBrowser> LaunchChromiumAsync() =>
         _playwright!.Chromium.LaunchAsync(new BrowserTypeLaunchOptions { Headless = true });
+
+    private static void ConfigureDriverSearchPath()
+    {
+        string? pluginDirectory = Path.GetDirectoryName(typeof(DialogAuthenticationService).Assembly.Location);
+        if (!string.IsNullOrWhiteSpace(pluginDirectory))
+            Environment.SetEnvironmentVariable("PLAYWRIGHT_DRIVER_SEARCH_PATH", pluginDirectory);
+    }
 
     private async Task CloseBrowserAsync()
     {

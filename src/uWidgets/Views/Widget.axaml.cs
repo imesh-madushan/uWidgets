@@ -72,9 +72,9 @@ public partial class Widget : Window
     public string Edit => $"{Locale.Widget_Edit} \"{widgetLayoutProvider.Get().Type}\"";
     public CornerRadius Radius => appSettingsProvider.Get().Theme.UseNativeFrame ? new(0) : new(appSettingsProvider.Get().Dimensions.Radius / (Screens.ScreenFromWindow(this)?.Scaling ?? 1.0));
     
-    public SystemDecorations WidgetSystemDecorations => appSettingsProvider.Get().Theme.UseNativeFrame
-        ? SystemDecorations.BorderOnly
-        : SystemDecorations.None;
+    public WindowDecorations WidgetWindowDecorations => appSettingsProvider.Get().Theme.UseNativeFrame
+        ? WindowDecorations.BorderOnly
+        : WindowDecorations.None;
 
     public bool ToolTipVisible => !appSettingsProvider.Get().Theme.UseNativeFrame && !appSettingsProvider.Get().Layout.LockSize;
     public bool WidgetExtendClientArea => appSettingsProvider.Get().Theme.UseNativeFrame;

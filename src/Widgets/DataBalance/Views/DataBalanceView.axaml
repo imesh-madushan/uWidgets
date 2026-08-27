@@ -11,8 +11,83 @@
     d:DesignWidth="300"
     d:DesignHeight="330">
 
-    <Border Width="300" MinHeight="330" Padding="12" Background="Transparent">
+    <UserControl.Styles>
+        <Style Selector="Button.setupPrimary">
+            <Setter Property="Height" Value="40" />
+            <Setter Property="Padding" Value="16,0" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Background" Value="#60CDFF" />
+            <Setter Property="Foreground" Value="#08151B" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+        </Style>
+        <Style Selector="Button.setupPrimary:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#86DBFF" />
+        </Style>
+        <Style Selector="Button.setupSecondary">
+            <Setter Property="Height" Value="30" />
+            <Setter Property="Padding" Value="10,0" />
+            <Setter Property="CornerRadius" Value="7" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="#90FFFFFF" />
+            <Setter Property="FontSize" Value="10" />
+        </Style>
+    </UserControl.Styles>
+
+    <Border MinWidth="276" MinHeight="330" Padding="16" Background="Transparent"
+            HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
         <Grid>
+            <!-- Playwright browser dependency consent -->
+            <Border IsVisible="{Binding IsDependencyPromptVisible}"
+                    VerticalAlignment="Center" Padding="16"
+                    CornerRadius="14" Background="#16000000"
+                    BorderBrush="#22FFFFFF" BorderThickness="1">
+                <StackPanel Spacing="10">
+                    <Border Width="48" Height="48" CornerRadius="24"
+                            Background="#1860CDFF" BorderBrush="#4060CDFF" BorderThickness="1"
+                            HorizontalAlignment="Center">
+                        <TextBlock Text="◉" FontSize="23" Foreground="#60CDFF"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+
+                    <StackPanel Spacing="5">
+                        <TextBlock Text="One-time browser setup" FontSize="18" FontWeight="SemiBold"
+                                   Foreground="White" HorizontalAlignment="Center" />
+                        <TextBlock Text="Data Balance needs a private Chromium session to connect securely to MyDialog."
+                                   FontSize="11" LineHeight="16" Foreground="#9AFFFFFF"
+                                   TextWrapping="Wrap" TextAlignment="Center" />
+                    </StackPanel>
+
+                    <Border Padding="9,7" CornerRadius="7" Background="#0CFFFFFF">
+                        <Grid ColumnDefinitions="Auto,*">
+                            <TextBlock Text="↓" FontSize="13" Foreground="#60CDFF"
+                                       VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="1" Margin="8,0,0,0"
+                                       Text="Downloads once • Internet required"
+                                       FontSize="9" Foreground="#78FFFFFF"
+                                       VerticalAlignment="Center" />
+                        </Grid>
+                    </Border>
+
+                    <Button Classes="setupPrimary" Content="Install Chromium"
+                            HorizontalAlignment="Stretch"
+                            IsEnabled="{Binding !IsInstallingDependencies}"
+                            Click="InstallDependenciesButton_Click" />
+                    <Button Classes="setupSecondary" Content="Already installed? Check again"
+                            HorizontalAlignment="Center"
+                            IsEnabled="{Binding !IsInstallingDependencies}"
+                            Click="CheckDependenciesButton_Click" />
+
+                    <ProgressBar IsIndeterminate="True" IsVisible="{Binding IsInstallingDependencies}"
+                                 Height="3" Foreground="#60CDFF" Background="#20FFFFFF" />
+                    <TextBlock Text="{Binding StatusMessage}" FontSize="9"
+                               Foreground="#70FFFFFF" TextAlignment="Center"
+                               TextTrimming="CharacterEllipsis" MaxLines="1"
+                               ToolTip.Tip="{Binding StatusMessage}" />
+                </StackPanel>
+            </Border>
+
             <!-- First-use account entry -->
             <StackPanel IsVisible="{Binding IsAccountEntryVisible}"
                         VerticalAlignment="Center" Spacing="12">
@@ -22,7 +97,7 @@
                            FontSize="11" Foreground="#A0FFFFFF" TextWrapping="Wrap"
                            TextAlignment="Center" />
                 <TextBox x:Name="AccountInput" Text="{Binding AccountIdentifier}"
-                         Watermark="Email or mobile number" FontSize="12"
+                         PlaceholderText="Email or mobile number" FontSize="12"
                          KeyDown="AccountInput_KeyDown" />
                 <Button Content="CONTINUE" HorizontalAlignment="Stretch"
                         Click="ContinueButton_Click" />
@@ -37,27 +112,39 @@
                            Foreground="White" HorizontalAlignment="Center" />
                 <TextBlock Text="{Binding StatusMessage}" FontSize="11"
                            Foreground="#A0FFFFFF" TextWrapping="Wrap" TextAlignment="Center" />
+                <TextBlock Text="{Binding OtpCountdown}" FontSize="10" Foreground="#60CDFF"
+                           HorizontalAlignment="Center" />
                 <StackPanel x:Name="OtpBoxesPanel" Orientation="Horizontal"
-                            HorizontalAlignment="Center" Spacing="5" />
-                <Grid ColumnDefinitions="*,*">
-                    <Button Grid.Column="0" Margin="0,0,4,0" Content="BACK" Click="CancelOtpButton_Click" />
-                    <Button Grid.Column="1" Margin="4,0,0,0" Content="RESEND" IsEnabled="{Binding CanResendOtp}"
+                            HorizontalAlignment="Center" Spacing="4" />
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                    <Button Grid.Column="0" Content="BACK" HorizontalAlignment="Stretch"
+                            Click="CancelOtpButton_Click" />
+                    <Button Grid.Column="1" Content="RESEND" HorizontalAlignment="Stretch"
+                            IsEnabled="{Binding CanResendOtp}"
                             Click="ResendOtpButton_Click" />
                 </Grid>
+                <TextBlock Text="{Binding ResendCountdown}" FontSize="9" Foreground="#70FFFFFF"
+                           HorizontalAlignment="Center" />
                 <ProgressBar IsIndeterminate="True" IsVisible="{Binding IsRefreshing}" Height="3" />
             </StackPanel>
 
             <!-- Linked connection chooser -->
             <Grid IsVisible="{Binding IsConnectionPickerVisible}" RowDefinitions="Auto,Auto,*,Auto">
                 <TextBlock Grid.Row="0" Text="Choose connection" FontSize="18"
-                           FontWeight="SemiBold" Foreground="White" />
+                           FontWeight="SemiBold" Foreground="White" HorizontalAlignment="Center" />
                 <TextBlock Grid.Row="1" Margin="0,5,0,8" Text="{Binding StatusMessage}"
-                           FontSize="10" Foreground="#90FFFFFF" />
+                           FontSize="10" Foreground="#90FFFFFF" HorizontalAlignment="Center" />
                 <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
-                    <ItemsControl ItemsSource="{Binding Connections}">
+                    <ItemsControl ItemsSource="{Binding Connections}" HorizontalAlignment="Stretch">
+                        <ItemsControl.Styles>
+                            <Style Selector="ContentPresenter">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            </Style>
+                        </ItemsControl.Styles>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate x:DataType="models:DialogConnection">
-                                <Button Margin="0,0,0,6" Padding="10" HorizontalContentAlignment="Stretch"
+                                <Button Margin="0,0,0,8" Padding="12,10"
+                                        HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
                                         Click="ConnectionButton_Click">
                                     <Grid ColumnDefinitions="*,Auto">
                                         <StackPanel>
@@ -91,7 +178,8 @@
             </StackPanel>
 
             <!-- Authenticated balance -->
-            <Grid IsVisible="{Binding IsBalanceVisible}" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
+            <Grid IsVisible="{Binding IsBalanceVisible}" RowDefinitions="Auto,Auto,Auto,Auto,Auto"
+                  VerticalAlignment="Center">
                 <Border Grid.Row="0" Padding="2,2,2,10" BorderBrush="#20FFFFFF" BorderThickness="0,0,0,1">
                     <Grid ColumnDefinitions="*,Auto,Auto">
                         <StackPanel Spacing="1">
@@ -158,11 +246,16 @@
 
                 <Grid Grid.Row="4" Margin="2,8,2,0" ColumnDefinitions="*,Auto">
                     <StackPanel>
-                        <TextBlock Text="{Binding ConnectionStatus}" FontSize="9" Foreground="#54D98C" />
+                        <TextBlock Text="{Binding ConnectionStatus}" FontSize="9"
+                                   Foreground="{Binding ConnectionStatusColor}" />
                         <TextBlock Text="{Binding UpdatedText}" FontSize="9" Foreground="#65FFFFFF" />
                     </StackPanel>
-                    <Button Grid.Column="1" Width="28" Height="28" Padding="0" Content="↻"
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+                        <Button IsVisible="{Binding IsReconnectVisible}" Height="28" Padding="9,0"
+                                Content="RECONNECT" FontSize="9" Click="ReconnectButton_Click" />
+                        <Button Width="28" Height="28" Padding="0" Content="↻"
                             ToolTip.Tip="Refresh now" Click="RefreshButton_Click" />
+                    </StackPanel>
                 </Grid>
             </Grid>
         </Grid>

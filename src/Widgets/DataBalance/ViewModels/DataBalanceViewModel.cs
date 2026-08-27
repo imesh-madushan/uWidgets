@@ -17,6 +17,8 @@ public sealed partial class DataBalanceViewModel : INotifyPropertyChanged
     private static readonly DialogAuthenticationService Authentication = new();
     private static readonly DialogApiService Api = new();
     private static readonly SemaphoreSlim OperationGate = new(1, 1);
+    private static readonly TimeSpan OtpLifetime = TimeSpan.FromMinutes(5);
+    private static readonly TimeSpan ResendCooldown = TimeSpan.FromSeconds(60);
 
     private static DialogCredentialState? _credentialState;
     private DialogAuthStatus _authStatus = DialogAuthStatus.NoAccount;
@@ -24,6 +26,15 @@ public sealed partial class DataBalanceViewModel : INotifyPropertyChanged
     private string _statusMessage = "Sign in to view your Dialog balance";
     private int _otpLength = 6;
     private bool _isRefreshing;
+    private bool _isDependencyPromptVisible;
+    private bool _isInstallingDependencies;
+    private DateTimeOffset? _otpExpiresAt;
+    private DateTimeOffset? _resendAvailableAt;
+    private string _activeChallengeIdentifier = "";
+    private bool _isReconnectVisible;
+    private string _otpCountdown = "";
+    private string _resendCountdown = "";
+    private string _connectionStatusColor = "#54D98C";
     private string _connectionName = "Dialog";
     private string _phoneNumber = "Not signed in";
     private string _connectionKind = "Connection";
@@ -68,13 +79,35 @@ public sealed partial class DataBalanceViewModel : INotifyPropertyChanged
         };
     }
 
-    public bool IsAccountEntryVisible => AuthStatus is DialogAuthStatus.NoAccount or DialogAuthStatus.EnteringAccount;
+    public bool IsAccountEntryVisible =>
+        !IsDependencyPromptVisible && AuthStatus is (DialogAuthStatus.NoAccount or DialogAuthStatus.EnteringAccount);
     public bool IsOtpVisible => AuthStatus is DialogAuthStatus.RequestingOtp or DialogAuthStatus.WaitingForOtp or
         DialogAuthStatus.SubmittingOtp or DialogAuthStatus.IncorrectOtp or DialogAuthStatus.OtpExpired;
     public bool IsBalanceVisible => AuthStatus == DialogAuthStatus.Authenticated;
     public bool IsConnectionPickerVisible => AuthStatus == DialogAuthStatus.ChoosingConnection;
     public bool IsErrorVisible => AuthStatus == DialogAuthStatus.Error;
-    public bool CanResendOtp => AuthStatus is DialogAuthStatus.WaitingForOtp or DialogAuthStatus.IncorrectOtp or DialogAuthStatus.OtpExpired;
+    public bool CanResendOtp =>
+        AuthStatus is (DialogAuthStatus.WaitingForOtp or DialogAuthStatus.IncorrectOtp or DialogAuthStatus.OtpExpired) &&
+        (!_resendAvailableAt.HasValue || DateTimeOffset.Now >= _resendAvailableAt.Value);
+    public string OtpCountdown { get => _otpCountdown; private set => SetField(ref _otpCountdown, value); }
+    public string ResendCountdown { get => _resendCountdown; private set => SetField(ref _resendCountdown, value); }
+    public bool IsReconnectVisible { get => _isReconnectVisible; private set => SetField(ref _isReconnectVisible, value); }
+    public string ConnectionStatusColor { get => _connectionStatusColor; private set => SetField(ref _connectionStatusColor, value); }
+    public bool IsDependencyPromptVisible
+    {
+        get => _isDependencyPromptVisible;
+        private set
+        {
+            if (!SetField(ref _isDependencyPromptVisible, value)) return;
+            OnPropertyChanged(nameof(IsAccountEntryVisible));
+        }
+    }
+
+    public bool IsInstallingDependencies
+    {
+        get => _isInstallingDependencies;
+        private set => SetField(ref _isInstallingDependencies, value);
+    }
 
     public string AccountIdentifier
     {
@@ -117,6 +150,51 @@ public sealed partial class DataBalanceViewModel : INotifyPropertyChanged
     {
         try
         {
+            if (!await Authentication.AreDependenciesInstalledAsync())
+            {
+                IsDependencyPromptVisible = true;
+                StatusMessage = "Chromium is not installed yet.";
+                return;
+            }
+        }
+        catch (Exception exception)
+        {
+            IsDependencyPromptVisible = true;
+            StatusMessage = GetDependencyErrorMessage(exception, "Playwright could not start");
+            return;
+        }
+
+        IsDependencyPromptVisible = false;
+        await LoadSavedAccountAsync();
+    }
+
+    public async Task InstallDependenciesAsync()
+    {
+        if (IsInstallingDependencies) return;
+        try
+        {
+            IsInstallingDependencies = true;
+            StatusMessage = "Downloading Chromium…";
+            await Authentication.InstallDependenciesAsync();
+            IsDependencyPromptVisible = false;
+            StatusMessage = "Chromium installed.";
+            await LoadSavedAccountAsync();
+        }
+        catch (Exception exception)
+        {
+            IsDependencyPromptVisible = true;
+            StatusMessage = GetDependencyErrorMessage(exception, "Chromium installation failed");
+        }
+        finally
+        {
+            IsInstallingDependencies = false;
+        }
+    }
+
+    private async Task LoadSavedAccountAsync()
+    {
+        try
+        {
             _credentialState = await Vault.LoadAsync();
         }
         catch (Exception exception)
@@ -133,7 +211,22 @@ public sealed partial class DataBalanceViewModel : INotifyPropertyChanged
         }
 
         AccountIdentifier = _credentialState.LoginIdentifier;
+        if (_credentialState.CachedSnapshot is not null)
+        {
+            ReplaceConnections(_credentialState.Connections);
+            ApplySnapshot(_credentialState.CachedSnapshot);
+        }
         await RefreshAsync();
+    }
+
+    private static string GetDependencyErrorMessage(Exception exception, string fallback)
+    {
+        if (exception.Message.Contains("Driver not found", StringComparison.OrdinalIgnoreCase))
+            return "Playwright driver files are missing. Rebuild the Data Balance widget.";
+
+        return exception.Message.Length <= 90
+            ? $"{fallback}: {exception.Message}"
+            : $"{fallback}. Please try again.";
     }
 
     public async Task StartLoginAsync()
@@ -146,14 +239,25 @@ public sealed partial class DataBalanceViewModel : INotifyPropertyChanged
             return;
         }
 
+        if (HasActiveChallenge(identifier))
+        {
+            AuthStatus = DialogAuthStatus.WaitingForOtp;
+            StatusMessage = "A code was already sent to this account. Enter that code below.";
+            UpdateOtpCountdown();
+            return;
+        }
+
         await OperationGate.WaitAsync();
         try
         {
+            if (!string.IsNullOrEmpty(_activeChallengeIdentifier))
+                await Authentication.CancelAsync();
             AuthStatus = DialogAuthStatus.RequestingOtp;
             StatusMessage = "Requesting verification code…";
             DialogOtpChallenge challenge = await Authentication.StartOtpAsync(identifier);
             OtpLength = challenge.Length;
             AccountIdentifier = identifier;
+            BeginOtpChallenge(identifier);
             AuthStatus = DialogAuthStatus.WaitingForOtp;
             StatusMessage = $"Enter the {OtpLength}-digit code sent by Dialog.";
         }
@@ -196,8 +300,10 @@ public sealed partial class DataBalanceViewModel : INotifyPropertyChanged
                 LoginIdentifier = AccountIdentifier.Trim(),
                 StorageStateJson = result.StorageStateJson,
                 SelectedConnection = previousSelection,
-                Connections = _credentialState?.Connections ?? []
+                Connections = _credentialState?.Connections ?? [],
+                CachedSnapshot = _credentialState?.CachedSnapshot
             };
+            ClearOtpChallenge();
             await Vault.SaveAsync(_credentialState);
             await RefreshCoreAsync(showPickerAfterFirstLogin: string.IsNullOrWhiteSpace(previousSelection));
         }
@@ -221,6 +327,9 @@ public sealed partial class DataBalanceViewModel : INotifyPropertyChanged
             AuthStatus = DialogAuthStatus.RequestingOtp;
             StatusMessage = "Requesting a new code…";
             await Authentication.ResendOtpAsync();
+            _otpExpiresAt = DateTimeOffset.Now.Add(OtpLifetime);
+            _resendAvailableAt = DateTimeOffset.Now.Add(ResendCooldown);
+            UpdateOtpCountdown();
             AuthStatus = DialogAuthStatus.WaitingForOtp;
             StatusMessage = "A new verification code was sent.";
         }
@@ -237,14 +346,16 @@ public sealed partial class DataBalanceViewModel : INotifyPropertyChanged
 
     public async Task CancelLoginAsync()
     {
-        await Authentication.CancelAsync();
         AuthStatus = DialogAuthStatus.EnteringAccount;
-        StatusMessage = "Change the email address or mobile number and try again.";
+        StatusMessage = HasActiveChallenge(AccountIdentifier.Trim())
+            ? "A code is still active for this account. Continue again to enter it."
+            : "Change the email address or mobile number and try again.";
     }
 
     public async Task RefreshAsync()
     {
         if (IsRefreshing) return;
+        if (IsOtpVisible) return;
         if (_credentialState is null)
         {
             ResetDisplay();
@@ -278,11 +389,13 @@ public sealed partial class DataBalanceViewModel : INotifyPropertyChanged
             {
                 StorageStateJson = result.StorageStateJson,
                 Connections = result.Connections,
-                SelectedConnection = selected
+                SelectedConnection = selected,
+                CachedSnapshot = result.Snapshot
             };
             await Vault.SaveAsync(_credentialState);
             ReplaceConnections(result.Connections);
             ApplySnapshot(result.Snapshot);
+            SetConnected(true);
 
             if (showPickerAfterFirstLogin && result.Connections.Count > 1)
             {
@@ -309,9 +422,15 @@ public sealed partial class DataBalanceViewModel : INotifyPropertyChanged
         }
         catch (Exception exception)
         {
-            ConnectionStatus = "Disconnected";
+            SetConnected(false);
             UpdatedText = $"Refresh failed: {exception.Message}";
-            if (AuthStatus != DialogAuthStatus.Authenticated)
+            if (_credentialState?.CachedSnapshot is not null)
+            {
+                ApplySnapshot(_credentialState.CachedSnapshot);
+                SetConnected(false);
+                AuthStatus = DialogAuthStatus.Authenticated;
+            }
+            else if (AuthStatus != DialogAuthStatus.Authenticated)
             {
                 AuthStatus = DialogAuthStatus.Error;
                 StatusMessage = UpdatedText;
@@ -340,11 +459,13 @@ public sealed partial class DataBalanceViewModel : INotifyPropertyChanged
             {
                 StorageStateJson = retry.StorageStateJson,
                 Connections = retry.Connections,
-                SelectedConnection = retry.Snapshot.Msisdn
+                SelectedConnection = retry.Snapshot.Msisdn,
+                CachedSnapshot = retry.Snapshot
             };
             await Vault.SaveAsync(_credentialState);
             ReplaceConnections(retry.Connections);
             ApplySnapshot(retry.Snapshot);
+            SetConnected(true);
             AuthStatus = DialogAuthStatus.Authenticated;
             return;
         }
@@ -354,6 +475,7 @@ public sealed partial class DataBalanceViewModel : INotifyPropertyChanged
         StatusMessage = "Your session expired. Requesting a verification code…";
         DialogOtpChallenge challenge = await Authentication.StartOtpAsync(AccountIdentifier);
         OtpLength = challenge.Length;
+        BeginOtpChallenge(AccountIdentifier);
         AuthStatus = DialogAuthStatus.WaitingForOtp;
         StatusMessage = $"Session expired. Enter the new {OtpLength}-digit code.";
     }
@@ -384,6 +506,7 @@ public sealed partial class DataBalanceViewModel : INotifyPropertyChanged
             await Authentication.CancelAsync();
             await Vault.DeleteAsync();
             _credentialState = null;
+            ClearOtpChallenge();
             Connections.Clear();
             AccountIdentifier = "";
             ResetDisplay();
@@ -413,6 +536,76 @@ public sealed partial class DataBalanceViewModel : INotifyPropertyChanged
         ApplyPackage(snapshot.Packages.ElementAtOrDefault(0), first: true);
         ApplyPackage(snapshot.Packages.ElementAtOrDefault(1), first: false);
         UpdatedText = $"Last updated: {snapshot.UpdatedAt:HH:mm:ss}";
+    }
+
+    public async Task UpdateOtpStateAsync()
+    {
+        // Keep enforcing the challenge lifetime even when the user presses Back.
+        // Back only hides OTP entry; it must not leave Chromium alive indefinitely.
+        if (!_otpExpiresAt.HasValue) return;
+        if (DateTimeOffset.Now < _otpExpiresAt.Value)
+        {
+            UpdateOtpCountdown();
+            return;
+        }
+
+        await Authentication.CancelAsync();
+        ClearOtpChallenge();
+        if (_credentialState?.CachedSnapshot is not null)
+        {
+            ApplySnapshot(_credentialState.CachedSnapshot);
+            SetConnected(false);
+            UpdatedText = "Verification timed out · showing last saved balance";
+            AuthStatus = DialogAuthStatus.Authenticated;
+        }
+        else
+        {
+            AuthStatus = DialogAuthStatus.EnteringAccount;
+            StatusMessage = "The verification code timed out. Reconnect when you are ready.";
+        }
+    }
+
+    private bool HasActiveChallenge(string identifier) =>
+        _otpExpiresAt.HasValue && DateTimeOffset.Now < _otpExpiresAt.Value &&
+        string.Equals(_activeChallengeIdentifier, identifier, StringComparison.OrdinalIgnoreCase);
+
+    private void BeginOtpChallenge(string identifier)
+    {
+        _activeChallengeIdentifier = identifier;
+        _otpExpiresAt = DateTimeOffset.Now.Add(OtpLifetime);
+        _resendAvailableAt = DateTimeOffset.Now.Add(ResendCooldown);
+        UpdateOtpCountdown();
+    }
+
+    private void ClearOtpChallenge()
+    {
+        _activeChallengeIdentifier = "";
+        _otpExpiresAt = null;
+        _resendAvailableAt = null;
+        OtpCountdown = "";
+        ResendCountdown = "";
+        OnPropertyChanged(nameof(CanResendOtp));
+    }
+
+    private void UpdateOtpCountdown()
+    {
+        TimeSpan remaining = (_otpExpiresAt ?? DateTimeOffset.Now) - DateTimeOffset.Now;
+        OtpCountdown = remaining > TimeSpan.Zero
+            ? $"Code available for {Math.Ceiling(remaining.TotalMinutes):0} min"
+            : "Code expired";
+
+        TimeSpan resend = (_resendAvailableAt ?? DateTimeOffset.Now) - DateTimeOffset.Now;
+        ResendCountdown = resend > TimeSpan.Zero
+            ? $"Resend available in {Math.Ceiling(resend.TotalSeconds):0}s"
+            : "You can request a new code";
+        OnPropertyChanged(nameof(CanResendOtp));
+    }
+
+    private void SetConnected(bool connected)
+    {
+        IsReconnectVisible = !connected;
+        ConnectionStatus = connected ? "Connected" : "Disconnected";
+        ConnectionStatusColor = connected ? "#54D98C" : "#FF6B6B";
     }
 
     private void ApplyPackage(DialogPackageSnapshot? package, bool first)

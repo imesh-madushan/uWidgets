@@ -44,7 +44,10 @@ public class AssemblyProvider : IAssemblyProvider
     {
         try
         {
-            var context = new AssemblyLoadContext(filePath, true);
+            // Use the same dependency-aware context used when activating a plugin.
+            // A plain AssemblyLoadContext cannot resolve plugin-local NuGet dependencies
+            // while DefinedTypes is being inspected.
+            var context = new PluginLoadContext(filePath);
             var assembly = context.LoadFromAssemblyPath(filePath);
             var localeAttribute = assembly.GetCustomAttributes<LocaleAttribute>().FirstOrDefault();
             var companyAttribute = assembly.GetCustomAttributes<AssemblyCompanyAttribute>().FirstOrDefault();

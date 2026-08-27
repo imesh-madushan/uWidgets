@@ -8,12 +8,13 @@
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Avalonia" Version="11.1.3" />
-		<PackageReference Include="Microsoft.Playwright" Version="1.55.0" />
-		<PackageReference Include="System.Security.Cryptography.ProtectedData" Version="8.0.0" />
+		<PackageReference Include="Avalonia" Version="12.1.1" />
+		<PackageReference Include="Microsoft.Playwright" Version="1.62.0" />
+		<PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.11" />
 	</ItemGroup>
 
 	<ItemGroup>

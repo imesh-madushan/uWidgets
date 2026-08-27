@@ -9,6 +9,7 @@ public sealed record DialogCredentialState
     public string StorageStateJson { get; init; } = "";
     public string SelectedConnection { get; init; } = "";
     public IReadOnlyList<DialogConnection> Connections { get; init; } = [];
+    public DialogBalanceSnapshot? CachedSnapshot { get; init; }
 }
 
 public enum DialogAuthStatus

@@ -5,7 +5,7 @@
         x:Class="uWidgets.Views.EditWidget"
         Background="{DynamicResource SettingsBackground}"
         ExtendClientAreaToDecorationsHint="True"
-        ExtendClientAreaChromeHints="NoChrome"
+        WindowDecorations="None"
         ExtendClientAreaTitleBarHeightHint="60"
         WindowStartupLocation="CenterOwner"
         Width="340" Height="340" CanResize="False"
