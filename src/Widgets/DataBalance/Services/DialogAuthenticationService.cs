@@ -118,9 +118,12 @@ public sealed class DialogAuthenticationService : IAsyncDisposable
 
             return new DialogOtpResult(DialogOtpResultKind.Error, "Dialog did not finish signing in. Try again.");
         }
-        catch (PlaywrightException exception)
+        catch (PlaywrightException)
         {
-            return new DialogOtpResult(DialogOtpResultKind.Error, $"Dialog login failed: {exception.Message}");
+            await CloseBrowserAsync();
+            return new DialogOtpResult(
+                DialogOtpResultKind.SessionLost,
+                "The secure login window stopped responding. Start sign-in again.");
         }
         finally
         {
@@ -235,16 +238,24 @@ public sealed class DialogAuthenticationService : IAsyncDisposable
 
     private async Task CloseBrowserAsync()
     {
-        if (_context is not null)
-            await _context.CloseAsync();
-        if (_browser is not null)
-            await _browser.CloseAsync();
-
+        IPage? page = _page;
+        IBrowserContext? context = _context;
+        IBrowser? browser = _browser;
+        IPlaywright? playwright = _playwright;
         _page = null;
         _context = null;
         _browser = null;
-        _playwright?.Dispose();
         _playwright = null;
+
+        // A crashed page/context must not prevent the remaining resources from
+        // being released or bubble an exception into Avalonia's timer thread.
+        try { if (page is not null && !page.IsClosed) await page.CloseAsync(); }
+        catch (PlaywrightException) { }
+        try { if (context is not null) await context.CloseAsync(); }
+        catch (PlaywrightException) { }
+        try { if (browser is not null && browser.IsConnected) await browser.CloseAsync(); }
+        catch (PlaywrightException) { }
+        playwright?.Dispose();
     }
 
     public async ValueTask DisposeAsync()

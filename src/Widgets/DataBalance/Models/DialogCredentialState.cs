@@ -33,6 +33,7 @@ public enum DialogOtpResultKind
     Success,
     Incorrect,
     Expired,
+    SessionLost,
     Error
 }
 

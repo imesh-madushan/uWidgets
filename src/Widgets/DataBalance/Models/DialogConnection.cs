@@ -72,6 +72,6 @@ public sealed record DialogConnection
 
     [JsonIgnore]
     public string DisplayName => string.IsNullOrWhiteSpace(NickName)
-        ? $"{FriendlyType} · {Connection}"
-        : $"{NickName} · {Connection}";
+        ? FriendlyType
+        : NickName;
 }

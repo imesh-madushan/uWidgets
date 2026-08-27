@@ -28,6 +28,7 @@ public sealed partial class DataBalanceViewModel : INotifyPropertyChanged
     private bool _isRefreshing;
     private bool _isDependencyPromptVisible;
     private bool _isInstallingDependencies;
+    private bool _isUpdatingOtpState;
     private DateTimeOffset? _otpExpiresAt;
     private DateTimeOffset? _resendAvailableAt;
     private string _activeChallengeIdentifier = "";
@@ -67,6 +68,10 @@ public sealed partial class DataBalanceViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(IsConnectionPickerVisible));
             OnPropertyChanged(nameof(IsErrorVisible));
             OnPropertyChanged(nameof(CanResendOtp));
+            OnPropertyChanged(nameof(IsOtpBusy));
+            OnPropertyChanged(nameof(IsOtpError));
+            OnPropertyChanged(nameof(OtpStatusColor));
+            OnPropertyChanged(nameof(CanEnterOtp));
         }
     }
 
@@ -86,6 +91,10 @@ public sealed partial class DataBalanceViewModel : INotifyPropertyChanged
     public bool IsBalanceVisible => AuthStatus == DialogAuthStatus.Authenticated;
     public bool IsConnectionPickerVisible => AuthStatus == DialogAuthStatus.ChoosingConnection;
     public bool IsErrorVisible => AuthStatus == DialogAuthStatus.Error;
+    public bool IsOtpBusy => AuthStatus is DialogAuthStatus.RequestingOtp or DialogAuthStatus.SubmittingOtp;
+    public bool IsOtpError => AuthStatus is DialogAuthStatus.IncorrectOtp or DialogAuthStatus.OtpExpired;
+    public string OtpStatusColor => IsOtpError ? "#FF8585" : IsOtpBusy ? "#60CDFF" : "#B8FFFFFF";
+    public bool CanEnterOtp => AuthStatus is DialogAuthStatus.WaitingForOtp or DialogAuthStatus.IncorrectOtp;
     public bool CanResendOtp =>
         AuthStatus is (DialogAuthStatus.WaitingForOtp or DialogAuthStatus.IncorrectOtp or DialogAuthStatus.OtpExpired) &&
         (!_resendAvailableAt.HasValue || DateTimeOffset.Now >= _resendAvailableAt.Value);
@@ -284,12 +293,25 @@ public sealed partial class DataBalanceViewModel : INotifyPropertyChanged
 
             if (result.Kind != DialogOtpResultKind.Success || result.StorageStateJson is null)
             {
+                if (result.Kind == DialogOtpResultKind.SessionLost)
+                {
+                    ClearOtpChallenge();
+                    AuthStatus = DialogAuthStatus.EnteringAccount;
+                    StatusMessage = result.Message;
+                    return;
+                }
+
                 AuthStatus = result.Kind switch
                 {
                     DialogOtpResultKind.Incorrect => DialogAuthStatus.IncorrectOtp,
                     DialogOtpResultKind.Expired => DialogAuthStatus.OtpExpired,
                     _ => DialogAuthStatus.WaitingForOtp
                 };
+                if (result.Kind == DialogOtpResultKind.Expired)
+                {
+                    _resendAvailableAt = DateTimeOffset.Now;
+                    UpdateOtpCountdown();
+                }
                 StatusMessage = result.Message;
                 return;
             }
@@ -335,8 +357,11 @@ public sealed partial class DataBalanceViewModel : INotifyPropertyChanged
         }
         catch (Exception exception)
         {
-            AuthStatus = DialogAuthStatus.OtpExpired;
-            StatusMessage = $"Unable to resend the code: {exception.Message}";
+            try { await Authentication.CancelAsync(); }
+            catch { }
+            ClearOtpChallenge();
+            AuthStatus = DialogAuthStatus.EnteringAccount;
+            StatusMessage = $"The code could not be resent. Start sign-in again. {exception.Message}";
         }
         finally
         {
@@ -344,12 +369,13 @@ public sealed partial class DataBalanceViewModel : INotifyPropertyChanged
         }
     }
 
-    public async Task CancelLoginAsync()
+    public Task CancelLoginAsync()
     {
         AuthStatus = DialogAuthStatus.EnteringAccount;
         StatusMessage = HasActiveChallenge(AccountIdentifier.Trim())
             ? "A code is still active for this account. Continue again to enter it."
             : "Change the email address or mobile number and try again.";
+        return Task.CompletedTask;
     }
 
     public async Task RefreshAsync()
@@ -542,26 +568,41 @@ public sealed partial class DataBalanceViewModel : INotifyPropertyChanged
     {
         // Keep enforcing the challenge lifetime even when the user presses Back.
         // Back only hides OTP entry; it must not leave Chromium alive indefinitely.
-        if (!_otpExpiresAt.HasValue) return;
+        if (_isUpdatingOtpState || !_otpExpiresAt.HasValue) return;
         if (DateTimeOffset.Now < _otpExpiresAt.Value)
         {
             UpdateOtpCountdown();
             return;
         }
 
-        await Authentication.CancelAsync();
-        ClearOtpChallenge();
-        if (_credentialState?.CachedSnapshot is not null)
+        _isUpdatingOtpState = true;
+        await OperationGate.WaitAsync();
+        try
         {
-            ApplySnapshot(_credentialState.CachedSnapshot);
-            SetConnected(false);
-            UpdatedText = "Verification timed out · showing last saved balance";
-            AuthStatus = DialogAuthStatus.Authenticated;
+            // A submit or resend may have completed while the timer waited for
+            // the operation gate. Re-check before closing its browser session.
+            if (!_otpExpiresAt.HasValue || DateTimeOffset.Now < _otpExpiresAt.Value)
+                return;
+
+            await Authentication.CancelAsync();
+            ClearOtpChallenge();
+            if (_credentialState?.CachedSnapshot is not null)
+            {
+                ApplySnapshot(_credentialState.CachedSnapshot);
+                SetConnected(false);
+                UpdatedText = "Verification timed out · showing last saved balance";
+                AuthStatus = DialogAuthStatus.Authenticated;
+            }
+            else
+            {
+                AuthStatus = DialogAuthStatus.EnteringAccount;
+                StatusMessage = "The verification code timed out. Start sign-in again when you are ready.";
+            }
         }
-        else
+        finally
         {
-            AuthStatus = DialogAuthStatus.EnteringAccount;
-            StatusMessage = "The verification code timed out. Reconnect when you are ready.";
+            OperationGate.Release();
+            _isUpdatingOtpState = false;
         }
     }
 

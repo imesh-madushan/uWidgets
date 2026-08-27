@@ -20,7 +20,8 @@ internal static class DialogAutomationProfile
 
     public static readonly string[] InvalidOtpMarkers =
     {
-        "invalid verification code", "invalid otp", "incorrect code", "incorrect otp"
+        "invalid verification code", "invalid otp", "incorrect code", "incorrect otp",
+        "verification code did not match", "otp not matched", "otp2003"
     };
 
     public static readonly string[] ExpiredOtpMarkers =

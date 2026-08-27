@@ -58,13 +58,19 @@ public partial class DataBalanceView : UserControl
             Dispatcher.UIThread.Post(() => BuildOtpBoxes(_viewModel.OtpLength));
 
         if (e.PropertyName == nameof(DataBalanceViewModel.AuthStatus) &&
-            _viewModel.IsOtpVisible && _viewModel.AuthStatus != DialogAuthStatus.SubmittingOtp)
+            _viewModel.IsOtpVisible)
         {
             Dispatcher.UIThread.Post(() =>
             {
-                _otpSubmissionStarted = false;
-                ClearOtpBoxes();
-                _otpBoxes.FirstOrDefault()?.Focus();
+                foreach (TextBox box in _otpBoxes)
+                    box.IsEnabled = _viewModel.CanEnterOtp;
+
+                if (_viewModel.CanEnterOtp)
+                {
+                    _otpSubmissionStarted = false;
+                    ClearOtpBoxes();
+                    _otpBoxes.FirstOrDefault()?.Focus();
+                }
             });
         }
     }
@@ -94,6 +100,7 @@ public partial class DataBalanceView : UserControl
                 BorderBrush = new SolidColorBrush(Color.Parse("#65FFFFFF")),
                 BorderThickness = new Avalonia.Thickness(1),
                 CornerRadius = new Avalonia.CornerRadius(6),
+                IsEnabled = _viewModel.CanEnterOtp,
                 Tag = index
             };
             box.TextChanged += OtpBox_TextChanged;
