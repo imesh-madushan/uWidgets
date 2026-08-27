@@ -6,3 +6,4 @@ riderModule.iml
 .idea/
 uWidgets.sln.DotSettings.user
 /src/.vs
+*.env

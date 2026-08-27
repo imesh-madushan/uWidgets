@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run uWidgets",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/uWidgets/bin/Debug/net8.0/uWidgets.exe",
+      "cwd": "${workspaceFolder}/src/uWidgets/bin/Debug/net8.0",
+      "stopAtEntry": false
+    }
+  ]
+}

@@ -1,0 +1,261 @@
+﻿<UserControl
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:DataBalance.ViewModels"
+    x:Class="DataBalance.Views.DataBalanceView"
+    x:DataType="vm:DataBalanceViewModel"
+    mc:Ignorable="d"
+    d:DesignWidth="300"
+    d:DesignHeight="330">
+
+	<!-- uWidgets supplies the outer translucent background -->
+	<Border
+        Width="300"
+        Padding="8"
+        Background="Transparent">
+
+		<StackPanel Spacing="0">
+
+			<!-- Header -->
+			<Border
+                Padding="4,4,4,11"
+                BorderBrush="#20FFFFFF"
+                BorderThickness="0,0,0,1">
+
+				<Grid ColumnDefinitions="Auto,*,Auto">
+
+					<!-- Reliable vector Wi-Fi icon -->
+					<Viewbox
+                        Grid.Column="0"
+                        Width="22"
+                        Height="22"
+                        Margin="0,0,8,0"
+                        VerticalAlignment="Top">
+
+						<Path
+                            Fill="#60CDFF"
+                            Stretch="Uniform"
+                            Data="M1,9 L3,11 C8,6 16,6 21,11 L23,9 C16.5,2.5 7.5,2.5 1,9 M5,13 L7,15 C9.8,12.2 14.2,12.2 17,15 L19,13 C15.1,9.1 8.9,9.1 5,13 M9,17 L12,20 L15,17 C13.3,15.3 10.7,15.3 9,17" />
+					</Viewbox>
+
+					<StackPanel
+                        Grid.Column="1"
+                        Spacing="2">
+
+						<TextBlock
+                            Text="{Binding ConnectionName}"
+                            FontSize="14"
+                            FontWeight="Bold"
+                            Foreground="White"
+                            TextTrimming="CharacterEllipsis" />
+
+						<TextBlock
+                            Text="{Binding PhoneNumber}"
+                            FontSize="10"
+                            Foreground="#78FFFFFF"
+                            TextTrimming="CharacterEllipsis" />
+					</StackPanel>
+
+					<!-- Connection badge -->
+					<Border
+                        Grid.Column="2"
+                        Padding="8,4"
+                        CornerRadius="10"
+                        Background="#2638C172"
+                        VerticalAlignment="Center">
+
+						<TextBlock
+                            Text="{Binding ConnectionStatus}"
+                            FontSize="9"
+                            FontWeight="SemiBold"
+                            Foreground="#54D98C" />
+					</Border>
+				</Grid>
+			</Border>
+
+			<!-- Prepaid balance -->
+			<Border
+                Padding="4,12"
+                BorderBrush="#20FFFFFF"
+                BorderThickness="0,0,0,1">
+
+				<StackPanel Spacing="6">
+
+					<TextBlock
+                        Text="PREPAID BALANCE"
+                        FontSize="9"
+                        FontWeight="SemiBold"
+                        Foreground="#78FFFFFF" />
+
+					<Grid ColumnDefinitions="*,Auto">
+
+						<TextBlock
+                            Grid.Column="0"
+                            Text="{Binding Balance}"
+                            FontSize="18"
+                            FontWeight="SemiBold"
+                            Foreground="White"
+                            VerticalAlignment="Center" />
+
+						<Border
+                            Grid.Column="1"
+                            Padding="7,3"
+                            CornerRadius="6"
+                            Background="#15FFFFFF"
+                            VerticalAlignment="Center">
+
+							<TextBlock
+                                Text="{Binding Validity}"
+                                FontSize="9"
+                                Foreground="#A0FFFFFF"
+                                TextTrimming="CharacterEllipsis" />
+						</Border>
+					</Grid>
+				</StackPanel>
+			</Border>
+
+			<!-- First data package -->
+			<Border
+                Padding="4,12"
+                BorderBrush="#20FFFFFF"
+                BorderThickness="0,0,0,1">
+
+				<StackPanel Spacing="7">
+
+					<Grid ColumnDefinitions="*,Auto">
+
+						<TextBlock
+                            Grid.Column="0"
+                            Text="{Binding PackageOneType}"
+                            FontSize="9"
+                            FontWeight="SemiBold"
+                            Foreground="#78FFFFFF"
+                            TextTrimming="CharacterEllipsis" />
+
+						<TextBlock
+                            Grid.Column="1"
+                            Text="{Binding PackageOneRemaining}"
+                            FontSize="14"
+                            FontWeight="SemiBold"
+                            Foreground="#60CDFF" />
+					</Grid>
+
+					<ProgressBar
+                        Height="4"
+                        Minimum="0"
+                        Maximum="100"
+                        Value="{Binding PackageOnePercentage}"
+                        Foreground="#60CDFF"
+                        Background="#28FFFFFF" />
+
+					<Grid ColumnDefinitions="*,Auto">
+
+						<TextBlock
+                            Grid.Column="0"
+                            MaxWidth="180"
+                            Text="{Binding PackageOneName}"
+                            FontSize="9"
+                            Foreground="#75FFFFFF"
+                            TextTrimming="CharacterEllipsis" />
+
+						<TextBlock
+                            Grid.Column="1"
+                            Margin="8,0,0,0"
+                            Text="{Binding PackageOneExpiry}"
+                            FontSize="9"
+                            Foreground="#60CDFF"
+                            TextTrimming="CharacterEllipsis" />
+					</Grid>
+				</StackPanel>
+			</Border>
+
+			<!-- Second data package -->
+			<Border
+                Padding="4,12"
+                BorderBrush="#20FFFFFF"
+                BorderThickness="0,0,0,1">
+
+				<StackPanel Spacing="7">
+
+					<Grid ColumnDefinitions="*,Auto">
+
+						<TextBlock
+                            Grid.Column="0"
+                            Text="{Binding PackageTwoType}"
+                            FontSize="9"
+                            FontWeight="SemiBold"
+                            Foreground="#78FFFFFF"
+                            TextTrimming="CharacterEllipsis" />
+
+						<TextBlock
+                            Grid.Column="1"
+                            Text="{Binding PackageTwoRemaining}"
+                            FontSize="14"
+                            FontWeight="SemiBold"
+                            Foreground="#60CDFF" />
+					</Grid>
+
+					<ProgressBar
+                        Height="4"
+                        Minimum="0"
+                        Maximum="100"
+                        Value="{Binding PackageTwoPercentage}"
+                        Foreground="#60CDFF"
+                        Background="#28FFFFFF" />
+
+					<Grid ColumnDefinitions="*,Auto">
+
+						<TextBlock
+                            Grid.Column="0"
+                            MaxWidth="180"
+                            Text="{Binding PackageTwoName}"
+                            FontSize="9"
+                            Foreground="#75FFFFFF"
+                            TextTrimming="CharacterEllipsis" />
+
+						<TextBlock
+                            Grid.Column="1"
+                            Margin="8,0,0,0"
+                            Text="{Binding PackageTwoExpiry}"
+                            FontSize="9"
+                            Foreground="#60CDFF"
+                            TextTrimming="CharacterEllipsis" />
+					</Grid>
+				</StackPanel>
+			</Border>
+
+			<!-- Footer -->
+			<Grid
+                Margin="4,10,4,2"
+                ColumnDefinitions="*,Auto">
+
+				<TextBlock
+                    Grid.Column="0"
+                    Text="{Binding UpdatedText}"
+                    FontSize="9"
+                    Foreground="#65FFFFFF"
+                    VerticalAlignment="Center" />
+
+				<Button
+                    Grid.Column="1"
+                    Width="28"
+                    Height="28"
+                    Padding="0"
+                    CornerRadius="14"
+                    Click="RefreshButton_Click"
+                    Background="#12FFFFFF"
+                    Foreground="#BFFFFFFF"
+                    ToolTip.Tip="Refresh now">
+
+					<TextBlock
+                        Text="↻"
+                        FontSize="16"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center" />
+				</Button>
+			</Grid>
+		</StackPanel>
+	</Border>
+</UserControl>

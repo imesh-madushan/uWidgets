@@ -1,5 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 18
+VisualStudioVersion = 18.9.12112.369
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uWidgets", "uWidgets\uWidgets.csproj", "{F59DB144-4BA4-48F3-B28C-343413AF0EA4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uWidgets.Core", "uWidgets.Core\uWidgets.Core.csproj", "{A3D5510F-046E-4C68-92B8-19401FEA2FB4}"
@@ -17,6 +20,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Weather", "Widgets\Weather\Weather.csproj", "{104F7BFD-ADE0-4A7D-87F7-F8897C10E134}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitor", "Widgets\Monitor\Monitor.csproj", "{F2F42D0C-C66E-47B2-A50D-CA3C6A2F13AA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataBalance", "Widgets\DataBalance\DataBalance.csproj", "{1788D966-24CC-4A5E-8AFE-5222A0C4FDE3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -56,6 +61,13 @@ Global
 		{F2F42D0C-C66E-47B2-A50D-CA3C6A2F13AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F2F42D0C-C66E-47B2-A50D-CA3C6A2F13AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F2F42D0C-C66E-47B2-A50D-CA3C6A2F13AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1788D966-24CC-4A5E-8AFE-5222A0C4FDE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1788D966-24CC-4A5E-8AFE-5222A0C4FDE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1788D966-24CC-4A5E-8AFE-5222A0C4FDE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1788D966-24CC-4A5E-8AFE-5222A0C4FDE3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{340079E1-2FE5-451F-8577-D1D88F437A17} = {208BA44D-33C9-4962-8FDB-CCD073BD3D88}
@@ -64,6 +76,10 @@ Global
 		{CD104FCB-BC8D-4A47-A03E-3D7934C8D16C} = {208BA44D-33C9-4962-8FDB-CCD073BD3D88}
 		{104F7BFD-ADE0-4A7D-87F7-F8897C10E134} = {208BA44D-33C9-4962-8FDB-CCD073BD3D88}
 		{F2F42D0C-C66E-47B2-A50D-CA3C6A2F13AA} = {208BA44D-33C9-4962-8FDB-CCD073BD3D88}
+		{1788D966-24CC-4A5E-8AFE-5222A0C4FDE3} = {208BA44D-33C9-4962-8FDB-CCD073BD3D88}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9BCFE75F-F629-45C7-9AB6-827B15439FE6}
 	EndGlobalSection
 	GlobalSection(RiderSharedRunConfigurations) = postSolution
 	EndGlobalSection
