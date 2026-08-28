@@ -1,0 +1,100 @@
+<UserControl
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:DataBalance.ViewModels"
+    xmlns:models="using:DataBalance.Models"
+    x:Class="DataBalance.Views.States.ConnectionPickerView"
+    x:DataType="vm:DataBalanceViewModel"
+    IsVisible="{Binding IsConnectionPickerVisible}"
+>
+    <Grid
+        RowDefinitions="Auto,Auto,*,Auto"
+        RowSpacing="8"
+    >
+        <StackPanel
+            Grid.Row="0"
+            Spacing="1"
+        >
+            <TextBlock
+                Text="CONNECTIONS"
+                FontSize="6"
+                FontWeight="Bold"
+                Foreground="#60CDFF"
+            />
+            <TextBlock
+                Text="Choose connection"
+                FontSize="14"
+                FontWeight="SemiBold"
+                Foreground="#E8FFFFFF"
+            />
+        </StackPanel>
+        <TextBlock
+            Grid.Row="1"
+            Text="{Binding StatusMessage}"
+            FontSize="9"
+            Foreground="#75FFFFFF"
+        />
+        <ScrollViewer
+            Grid.Row="2"
+            VerticalScrollBarVisibility="Auto"
+        >
+            <ItemsControl
+                ItemsSource="{Binding Connections}"
+                HorizontalAlignment="Stretch"
+            >
+                <ItemsControl.Styles>
+                    <Style Selector="ContentPresenter">
+                        <Setter
+                            Property="HorizontalContentAlignment"
+                            Value="Stretch"
+                        />
+                    </Style>
+                </ItemsControl.Styles>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="models:DialogConnection">
+                        <Button
+                            Classes="connection"
+                            Margin="0,0,0,6"
+                            Click="ConnectionButton_Click"
+                        >
+                            <Grid ColumnDefinitions="*,Auto">
+                                <StackPanel Spacing="2">
+                                    <TextBlock
+                                        Text="{Binding DisplayName}"
+                                        Foreground="#E0FFFFFF"
+                                        FontWeight="SemiBold"
+                                        FontSize="11"
+                                        TextTrimming="CharacterEllipsis"
+                                    />
+                                    <TextBlock
+                                        Text="{Binding PackageName}"
+                                        Foreground="#60FFFFFF"
+                                        FontSize="8"
+                                        TextTrimming="CharacterEllipsis"
+                                    />
+                                </StackPanel>
+                                <TextBlock
+                                    Grid.Column="1"
+                                    Margin="8,0,0,0"
+                                    Text="{Binding FriendlyType}"
+                                    Foreground="#60CDFF"
+                                    FontSize="8"
+                                    VerticalAlignment="Center"
+                                />
+                            </Grid>
+                        </Button>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+        <Button
+            Grid.Row="3"
+            Classes="compact"
+            Content="Sign Out"
+            HorizontalAlignment="Stretch"
+            Click="SignOutButton_Click"
+            HorizontalContentAlignment="Center"
+            VerticalContentAlignment="Center"
+        />
+    </Grid>
+</UserControl>

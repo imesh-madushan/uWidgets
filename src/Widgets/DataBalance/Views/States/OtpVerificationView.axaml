@@ -1,0 +1,142 @@
+<UserControl
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:DataBalance.ViewModels"
+    xmlns:icons="using:FluentIcons.Avalonia"
+    x:Class="DataBalance.Views.States.OtpVerificationView"
+    x:DataType="vm:DataBalanceViewModel"
+    IsVisible="{Binding IsOtpVisible}"
+>
+    <Grid
+        RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto"
+        VerticalAlignment="Center"
+        RowSpacing="12"
+    >
+        <Grid
+            Grid.Row="0"
+            ColumnDefinitions="Auto,*"
+        >
+            <Border
+                Width="32"
+                Height="32"
+                CornerRadius="16"
+                Background="#1760CDFF"
+                BorderBrush="#4560CDFF"
+                BorderThickness="1"
+            >
+                <icons:FluentIcon
+                    Icon="ShieldLock"
+                    IconVariant="Regular"
+                    IconSize="Size20"
+                    Foreground="#60CDFF"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                />
+            </Border>
+            <StackPanel
+                Grid.Column="1"
+                Margin="10,0,0,0"
+                VerticalAlignment="Center"
+                Spacing="1"
+            >
+                <TextBlock
+                    Text="Verification Code"
+                    FontSize="12"
+                    FontWeight="SemiBold"
+                    Foreground="#F0FFFFFF"
+                />
+                <TextBlock
+                    Text="Secure MyDialog sign-in"
+                    FontSize="8"
+                    Foreground="#78FFFFFF"
+                />
+            </StackPanel>
+        </Grid>
+        <Border
+            Grid.Row="1"
+            MinHeight="32"
+            Padding="10,7"
+            CornerRadius="6"
+            Background="#0DFFFFFF"
+            BorderBrush="#1AFFFFFF"
+            BorderThickness="1"
+        >
+            <StackPanel Spacing="6">
+                <TextBlock
+                    Text="{Binding StatusMessage}"
+                    FontSize="9"
+                    Foreground="{Binding OtpStatusColor}"
+                    TextWrapping="Wrap"
+                    TextAlignment="Center"
+                />
+                <ProgressBar
+                    IsIndeterminate="True"
+                    IsVisible="{Binding IsOtpBusy}"
+                    Classes="usage"
+                />
+            </StackPanel>
+        </Border>
+        <Grid
+            Grid.Row="2"
+            ColumnDefinitions="*,Auto"
+        >
+            <TextBlock
+                Text="Enter code"
+                FontSize="8"
+                FontWeight="SemiBold"
+                Foreground="#72FFFFFF"
+                VerticalAlignment="Center"
+            />
+            <TextBlock
+                Grid.Column="1"
+                Text="{Binding OtpCountdown}"
+                FontSize="9"
+                Foreground="#60CDFF"
+                VerticalAlignment="Center"
+            />
+        </Grid>
+        <!-- OTP text boxes are generated in this view's code-behind. -->
+        <StackPanel
+            Grid.Row="3"
+            x:Name="OtpBoxesPanel"
+            Orientation="Horizontal"
+            HorizontalAlignment="Center"
+            Spacing="8"
+        />
+        <Grid
+            Grid.Row="4"
+            ColumnDefinitions="*,*"
+            ColumnSpacing="8"
+        >
+            <Button
+                Grid.Column="0"
+                Classes="compact"
+                Content="Back"
+                FontSize="12"
+                HorizontalAlignment="Stretch"
+                Click="CancelOtpButton_Click"
+                HorizontalContentAlignment="Center"
+                VerticalContentAlignment="Center"
+            />
+            <Button
+                Grid.Column="1"
+                Classes="compact"
+                Content="Resend"
+                FontSize="12"
+                HorizontalAlignment="Stretch"
+                IsEnabled="{Binding CanResendOtp}"
+                Click="ResendOtpButton_Click"
+                HorizontalContentAlignment="Center"
+                VerticalContentAlignment="Center"
+            />
+        </Grid>
+        <TextBlock
+            Grid.Row="5"
+            Text="{Binding ResendCountdown}"
+            FontSize="8"
+            Foreground="#68FFFFFF"
+            HorizontalAlignment="Center"
+            TextAlignment="Center"
+        />
+    </Grid>
+</UserControl>

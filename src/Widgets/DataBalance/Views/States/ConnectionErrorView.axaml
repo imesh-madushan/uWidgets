@@ -1,0 +1,49 @@
+<UserControl
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:DataBalance.ViewModels"
+    x:Class="DataBalance.Views.States.ConnectionErrorView"
+    x:DataType="vm:DataBalanceViewModel"
+    IsVisible="{Binding IsErrorVisible}"
+>
+    <StackPanel
+        VerticalAlignment="Center"
+        Spacing="10"
+    >
+        <TextBlock
+            Text="Connection ERROR"
+            FontSize="9"
+            FontWeight="Bold"
+            Foreground="#FF8585"
+            HorizontalAlignment="Center"
+        />
+        <TextBlock
+            Text="Unable to load balance"
+            FontSize="16"
+            FontWeight="SemiBold"
+            Foreground="#E8FFFFFF"
+            HorizontalAlignment="Center"
+        />
+        <TextBlock
+            Text="{Binding StatusMessage}"
+            FontSize="9"
+            Foreground="#82FFFFFF"
+            TextWrapping="Wrap"
+            TextAlignment="Center"
+        />
+        <Button
+            Classes="primary"
+            Content="Try Again"
+            HorizontalAlignment="Stretch"
+            Click="RefreshButton_Click"
+            HorizontalContentAlignment="Center"
+        />
+        <Button
+            Classes="compact"
+            Content="Sign Out"
+            HorizontalAlignment="Stretch"
+            HorizontalContentAlignment="Center"
+            Click="SignOutButton_Click"
+        />
+    </StackPanel>
+</UserControl>

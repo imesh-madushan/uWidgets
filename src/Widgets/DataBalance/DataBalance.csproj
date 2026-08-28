@@ -19,7 +19,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\uWidgets.Core\uWidgets.Core.csproj" />
+		<!-- uWidgets.Core is provided by the host application. Keeping it compile-only
+		     prevents widget builds from replacing the host's loaded assembly. -->
+		<ProjectReference Include="..\..\uWidgets.Core\uWidgets.Core.csproj">
+			<Private>false</Private>
+			<ExcludeAssets>runtime</ExcludeAssets>
+		</ProjectReference>
 	</ItemGroup>
 	
 </Project>

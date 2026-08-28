@@ -1,0 +1,76 @@
+<UserControl
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:DataBalance.ViewModels"
+    xmlns:icons="using:FluentIcons.Avalonia"
+    x:Class="DataBalance.Views.States.DependencySetupView"
+    x:DataType="vm:DataBalanceViewModel"
+    IsVisible="{Binding IsDependencyPromptVisible}"
+>
+    <StackPanel
+        VerticalAlignment="Center"
+        Spacing="10"
+    >
+        <Border
+            Width="34"
+            Height="34"
+            CornerRadius="17"
+            Background="#1760CDFF"
+            BorderBrush="#4060CDFF"
+            BorderThickness="1"
+            HorizontalAlignment="Center"
+        >
+            <icons:FluentIcon
+                Icon="ArrowDownload"
+                IconVariant="Regular"
+                IconSize="Size20"
+                Foreground="#60CDFF"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+            />
+        </Border>
+        <TextBlock
+            Text="Browser Setup"
+            FontSize="14"
+            FontWeight="Bold"
+            Foreground="#E8FFFFFF"
+            HorizontalAlignment="Center"
+        />
+        <TextBlock
+            Text="A private Chromium session is required to connect to MyDialog."
+            FontSize="10"
+            LineHeight="14"
+            Foreground="#88FFFFFF"
+            TextWrapping="Wrap"
+            TextAlignment="Center"
+        />
+        <Button
+            Classes="primary"
+            Content="Install Chromium"
+            HorizontalAlignment="Stretch"
+            IsEnabled="{Binding !IsInstallingDependencies}"
+            Click="InstallDependenciesButton_Click"
+            HorizontalContentAlignment="Center"
+        />
+        <Button
+            Classes="compact"
+            Content="Check Again"
+            HorizontalAlignment="Stretch"
+            IsEnabled="{Binding !IsInstallingDependencies}"
+            Click="CheckDependenciesButton_Click"
+            HorizontalContentAlignment="Center"
+        />
+        <ProgressBar
+            IsIndeterminate="True"
+            IsVisible="{Binding IsInstallingDependencies}"
+            Classes="usage"
+        />
+        <TextBlock
+            Text="{Binding StatusMessage}"
+            FontSize="9"
+            Foreground="#70FFFFFF"
+            TextAlignment="Center"
+            TextWrapping="Wrap"
+        />
+    </StackPanel>
+</UserControl>

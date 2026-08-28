@@ -1,0 +1,85 @@
+<UserControl
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:DataBalance.ViewModels"
+    xmlns:icons="using:FluentIcons.Avalonia"
+    x:Class="DataBalance.Views.States.AccountEntryView"
+    x:DataType="vm:DataBalanceViewModel"
+    IsVisible="{Binding IsAccountEntryVisible}"
+>
+    <StackPanel
+        VerticalAlignment="Center"
+        Spacing="12"
+    >
+        <Border
+            Width="42"
+            Height="42"
+            CornerRadius="21"
+            Background="#1760CDFF"
+            BorderBrush="#4060CDFF"
+            BorderThickness="1"
+            HorizontalAlignment="Center"
+        >
+            <icons:FluentIcon
+                Icon="PersonKey"
+                IconVariant="Regular"
+                IconSize="Size24"
+                Foreground="#60CDFF"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+            />
+        </Border>
+        <StackPanel Spacing="4">
+            <TextBlock
+                Text="My Dialog"
+                FontSize="9"
+                FontWeight="Bold"
+                Foreground="#60CDFF"
+                HorizontalAlignment="Center"
+            />
+            <TextBlock
+                Text="Connect account"
+                FontSize="16"
+                FontWeight="SemiBold"
+                Foreground="#F0FFFFFF"
+                HorizontalAlignment="Center"
+            />
+        </StackPanel>
+        <TextBlock
+            Text="Enter the email or Dialog mobile number linked to your account."
+            FontSize="10"
+            LineHeight="15"
+            Foreground="#A0FFFFFF"
+            TextWrapping="Wrap"
+            TextAlignment="Center"
+            MaxWidth="260"
+            HorizontalAlignment="Center"
+        />
+        <TextBox
+            Text="{Binding AccountIdentifier}"
+            PlaceholderText="Email or mobile number"
+            FontSize="11"
+            Height="38"
+            Padding="11,0"
+            CornerRadius="6"
+            KeyDown="AccountInput_KeyDown"
+            VerticalContentAlignment="Center"
+        />
+        <Button
+            Content="Continue"
+            HorizontalAlignment="Center"
+            Click="ContinueButton_Click"
+            FontSize="10"
+            CornerRadius="6"
+            Padding="8,4"
+        />
+        <TextBlock
+            Text="{Binding StatusMessage}"
+            FontSize="9"
+            Foreground="#8CFFFFFF"
+            TextWrapping="Wrap"
+            TextAlignment="Center"
+            Margin="0,2,0,0"
+        />
+    </StackPanel>
+</UserControl>

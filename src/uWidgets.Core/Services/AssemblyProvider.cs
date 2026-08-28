@@ -47,8 +47,10 @@ public class AssemblyProvider : IAssemblyProvider
             // Use the same dependency-aware context used when activating a plugin.
             // A plain AssemblyLoadContext cannot resolve plugin-local NuGet dependencies
             // while DefinedTypes is being inspected.
-            var context = new PluginLoadContext(filePath);
-            var assembly = context.LoadFromAssemblyPath(filePath);
+            // Metadata inspection is short-lived, so it can use the original path.
+            // Active widgets use shadow copies in LoadAssembly below.
+            var context = PluginLoadContext.CreateForInspection(filePath);
+            var assembly = context.LoadPluginAssembly();
             var localeAttribute = assembly.GetCustomAttributes<LocaleAttribute>().FirstOrDefault();
             var companyAttribute = assembly.GetCustomAttributes<AssemblyCompanyAttribute>().FirstOrDefault();
             var widgetAttributes = assembly.GetCustomAttributes<WidgetInfoAttribute>();
@@ -64,6 +66,7 @@ public class AssemblyProvider : IAssemblyProvider
             context.Unload();
             GC.Collect();
             GC.WaitForPendingFinalizers();
+            context.DeleteShadowCopy();
 
             return new AssemblyInfo(filePath, assemblyName, displayName, company, version, localeAttribute?.IconData ?? "");
         }
@@ -82,10 +85,10 @@ public class AssemblyProvider : IAssemblyProvider
                 assembly.ManifestModule.Name == $"{name}.dll");
         
         var filePath = GetAssemblyPath(name);
-        context = new PluginLoadContext(filePath);
+        context = PluginLoadContext.CreateShadowCopy(filePath);
         loadedContexts[name] = context;
 
-        return context.LoadFromAssemblyPath(filePath);
+        return ((PluginLoadContext)context).LoadPluginAssembly();
     }
     
     /// <inheritdoc />
@@ -98,6 +101,9 @@ public class AssemblyProvider : IAssemblyProvider
         loadedContexts.Remove(name);
         GC.Collect();
         GC.WaitForPendingFinalizers();
+
+        if (context is PluginLoadContext pluginContext)
+            pluginContext.DeleteShadowCopy();
     }
 
     /// <inheritdoc />
@@ -140,9 +146,72 @@ public class AssemblyProvider : IAssemblyProvider
         throw new FileNotFoundException($"Assembly {name} not found");
     }
 
-    private class PluginLoadContext(string pluginPath) : AssemblyLoadContext(true)
+    /// <summary>
+    /// Loads a widget from a private shadow directory. Loading directly from the build
+    /// output would lock the widget DLLs and prevent Visual Studio from rebuilding them.
+    /// </summary>
+    private sealed class PluginLoadContext : AssemblyLoadContext
     {
-        private readonly AssemblyDependencyResolver resolver = new(pluginPath);
+        private readonly string pluginPath;
+        private readonly string? shadowDirectory;
+        private readonly AssemblyDependencyResolver resolver;
+
+        private PluginLoadContext(string pluginPath, string? shadowDirectory)
+            : base(isCollectible: true)
+        {
+            this.pluginPath = pluginPath;
+            this.shadowDirectory = shadowDirectory;
+            resolver = new AssemblyDependencyResolver(pluginPath);
+        }
+
+        public static PluginLoadContext CreateForInspection(string pluginPath) =>
+            new(pluginPath, shadowDirectory: null);
+
+        public static PluginLoadContext CreateShadowCopy(string sourcePluginPath)
+        {
+            var shadowDirectory = Path.Combine(
+                Path.GetTempPath(),
+                Const.AppName,
+                "PluginShadow",
+                Environment.ProcessId.ToString(),
+                Guid.NewGuid().ToString("N"));
+
+            CopyDirectory(Path.GetDirectoryName(sourcePluginPath)!, shadowDirectory);
+            var shadowPluginPath = Path.Combine(shadowDirectory, Path.GetFileName(sourcePluginPath));
+
+            return new PluginLoadContext(shadowPluginPath, shadowDirectory);
+        }
+
+        public Assembly LoadPluginAssembly() => LoadFromAssemblyPath(pluginPath);
+
+        public void DeleteShadowCopy()
+        {
+            try
+            {
+                if (shadowDirectory is not null && Directory.Exists(shadowDirectory))
+                    Directory.Delete(shadowDirectory, recursive: true);
+            }
+            catch (IOException)
+            {
+                // A delayed runtime handle may keep the shadow copy alive briefly.
+                // It is in the OS temp directory and can be reclaimed later.
+            }
+            catch (UnauthorizedAccessException)
+            {
+                // Cleanup failure must not prevent a widget from unloading.
+            }
+        }
+
+        private static void CopyDirectory(string sourceDirectory, string destinationDirectory)
+        {
+            Directory.CreateDirectory(destinationDirectory);
+
+            foreach (var filePath in Directory.EnumerateFiles(sourceDirectory))
+                File.Copy(filePath, Path.Combine(destinationDirectory, Path.GetFileName(filePath)), overwrite: true);
+
+            foreach (var directoryPath in Directory.EnumerateDirectories(sourceDirectory))
+                CopyDirectory(directoryPath, Path.Combine(destinationDirectory, Path.GetFileName(directoryPath)));
+        }
 
         protected override Assembly? Load(AssemblyName assemblyName)
         {
