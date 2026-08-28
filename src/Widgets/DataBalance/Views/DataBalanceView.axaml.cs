@@ -80,26 +80,28 @@ public partial class DataBalanceView : UserControl
         OtpBoxesPanel.Children.Clear();
         _otpBoxes.Clear();
 
-        // Keep the complete code comfortably inside the widget's 276 px content area.
-        double width = Math.Clamp((244d - (Math.Max(1, count) - 1) * 4) / Math.Max(1, count), 24, 32);
+        // Use the available content width so the code row aligns with the controls above and below it.
+        const double spacing = 8;
+        double width = Math.Clamp((280d - (Math.Max(1, count) - 1) * spacing) / Math.Max(1, count), 28, 40);
         for (int index = 0; index < count; index++)
         {
             var box = new TextBox
             {
                 Width = width,
                 MinWidth = 0,
-                Height = 36,
+                Height = 40,
                 MinHeight = 0,
                 Padding = new Avalonia.Thickness(0),
-                FontSize = 16,
+                FontSize = 17,
                 MaxLength = count,
                 TextAlignment = TextAlignment.Center,
                 HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center,
                 VerticalContentAlignment = Avalonia.Layout.VerticalAlignment.Center,
-                Background = new SolidColorBrush(Color.Parse("#18FFFFFF")),
-                BorderBrush = new SolidColorBrush(Color.Parse("#65FFFFFF")),
+                Foreground = new SolidColorBrush(Color.Parse("#E7B6EF")),
+                Background = new SolidColorBrush(Color.Parse("#16FFFFFF")),
+                BorderBrush = new SolidColorBrush(Color.Parse("#42FFFFFF")),
                 BorderThickness = new Avalonia.Thickness(1),
-                CornerRadius = new Avalonia.CornerRadius(6),
+                CornerRadius = new Avalonia.CornerRadius(7),
                 IsEnabled = _viewModel.CanEnterOtp,
                 Tag = index
             };

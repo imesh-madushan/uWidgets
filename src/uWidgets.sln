@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 18.9.12112.369
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uWidgets", "uWidgets\uWidgets.csproj", "{F59DB144-4BA4-48F3-B28C-343413AF0EA4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1788D966-24CC-4A5E-8AFE-5222A0C4FDE3} = {1788D966-24CC-4A5E-8AFE-5222A0C4FDE3}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uWidgets.Core", "uWidgets.Core\uWidgets.Core.csproj", "{A3D5510F-046E-4C68-92B8-19401FEA2FB4}"
 EndProject

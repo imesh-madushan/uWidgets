@@ -10,9 +10,14 @@ public static class Const
     /// </summary>
     public const string AppName = "uWidgets";
     /// <summary>
-    /// The folder with the application.
+    /// The folder containing the application assemblies and content files.
     /// </summary>
-    public static readonly string CurrentFolder = Path.GetDirectoryName(Environment.ProcessPath)!;    
+    /// <remarks>
+    /// <see cref="Environment.ProcessPath"/> cannot be used here because hosted scenarios,
+    /// including the Avalonia designer, run the application through <c>dotnet.exe</c>.
+    /// In those cases it points to the .NET installation instead of the application's output.
+    /// </remarks>
+    public static readonly string CurrentFolder = AppContext.BaseDirectory;
     /// <summary>
     /// The folder with the widgets.
     /// </summary>
